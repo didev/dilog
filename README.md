@@ -6,3 +6,7 @@
 dilog -http :80
 ```
 
+# cross platform compile
+```
+sh build.sh
+```
