@@ -140,7 +140,7 @@ func title() string {
 						%s%s
 						%s%s
 						%s</div><br><br>`,
-			"Time",flength("Time",20),
+			"Time",flength("Time",26),
 			"Keep",flength("Keep",5),
 			"IP",flength("IP",14),
 			"User",flength("User",19),

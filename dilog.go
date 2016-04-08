@@ -65,9 +65,9 @@ func main() {
 		addDB(localip, *keepPtr, *logPtr, *projectPtr, DBIP, *slugPtr, UTCtime(), *toolPtr, user)
 	} else if *findPtr != "" {
 		//find mode
-		fmt.Printf("%-19s %-04s %-15s %-20s %-10s %-10s %-14s %s\n","Time", "Keep", "IP","User","Tool","Project","Slug","Log")
-		fmt.Printf("%-19s %-04s %-15s %-20s %-10s %-10s %-14s %s\n",
-					strings.Repeat("-",19),
+		fmt.Printf("%-25s %-04s %-15s %-20s %-10s %-10s %-14s %s\n","Time", "Keep", "IP","User","Tool","Project","Slug","Log")
+		fmt.Printf("%-25s %-04s %-15s %-20s %-10s %-10s %-14s %s\n",
+					strings.Repeat("-",25),
 					strings.Repeat("-", 4),
 					strings.Repeat("-",15),
 					strings.Repeat("-",20),
@@ -77,7 +77,7 @@ func main() {
 					strings.Repeat("-",20),
 				)
 		for _,i := range findDB(*findPtr) {
-			fmt.Printf("%-19s %-4s %-15s %-20s %-10s %-10s %-14s %s\n", i.Time, i.Keep, i.Cip, i.User, i.Tool, i.Project, i.Slug, i.Log)
+			fmt.Printf("%-25s %-4s %-15s %-20s %-10s %-10s %-14s %s\n", i.Time, i.Keep, i.Cip, i.User, i.Tool, i.Project, i.Slug, i.Log)
 		}
 	} else if *findnumPtr != "" {
 		fmt.Printf("%d\n", findnumDB(*findnumPtr))
