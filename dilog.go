@@ -12,11 +12,12 @@ import (
 
 const DBIP = "10.0.90.251"
 
-func timenow() string {
-	t := time.Now()
-	return fmt.Sprintf("%d/%02d/%02d-%02d:%02d:%02d",
-			t.Year(), t.Month(), t.Day(),
-			t.Hour(), t.Minute(), t.Second())
+func UTCtime() string {
+	now := time.Now().String()
+	date := strings.Split(now, " ")[0]
+	time := strings.Split(now, " ")[1][0:5]
+	utc := strings.Split(now, " ")[2]
+	return fmt.Sprintf("%s %s UTC%s", date, time, utc)
 }
 
 func username() string {
@@ -61,7 +62,7 @@ func main() {
 		} else {
 			user = *userPtr
 		}
-		addDB(localip, *keepPtr, *logPtr, *projectPtr, DBIP, *slugPtr, timenow(), *toolPtr, user)
+		addDB(localip, *keepPtr, *logPtr, *projectPtr, DBIP, *slugPtr, UTCtime(), *toolPtr, user)
 	} else if *findPtr != "" {
 		//find mode
 		fmt.Printf("%-19s %-04s %-15s %-20s %-10s %-10s %-14s %s\n","Time", "Keep", "IP","User","Tool","Project","Slug","Log")
