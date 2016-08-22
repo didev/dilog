@@ -33,7 +33,11 @@ func www_root(w http.ResponseWriter, r *http.Request) {
 		return
 	} else if len(urllist) == 3 {
 		tool = urllist[2]
-		logs = findtDB(tool)
+		logs, err := findtDB(tool)
+		if err != nil {
+			io.WriteString(w, headHTML + "<br><center>DB 또는 네트워크 장애로 로그를 가지고 올 수 없습니다.</center>")
+			return
+		}
 		io.WriteString(w, headHTML + infoHTML(tool,"","") + searchboxHTML(searchword) + logHTML(logs))
 		return
 	}  else {

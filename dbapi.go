@@ -77,17 +77,22 @@ func allDB() ([]Log, error) {
 }
 
 
-func findtDB(toolname string) []Log {
+func findtDB(toolname string) ([]Log, error) {
 	var results []Log
 	session, err := mgo.Dial(DBIP)
 	if err != nil {
-		os.Exit(1)
+		log.Println("DB Connect Err : ", err)
+		return results, err
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	c :=  session.DB("dilog").C("log")
-	c.Find(bson.M{"tool": &bson.RegEx{Pattern: toolname, Options: "i"}}).Sort("-time").All(&results)
-	return results
+	err = c.Find(bson.M{"tool": &bson.RegEx{Pattern: toolname, Options: "i"}}).Sort("-time").All(&results)
+	if err != nil {
+		log.Println("DB Connect Err : ", err)
+		return results, err
+	}
+	return results, nil
 }
 
 func findtpDB(toolname,project string) []Log {
