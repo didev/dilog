@@ -8,6 +8,7 @@ import (
 	"runtime"
 	"os"
 	"strings"
+	"log"
 	)
 
 const DBIP = "10.0.90.251"
@@ -35,6 +36,7 @@ func username() string {
 }
 
 func main() {
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	var localip string
 	var user string
 	toolPtr := flag.String("tool", "", "add mode. | tool name (indispensable)")
@@ -62,7 +64,10 @@ func main() {
 		} else {
 			user = *userPtr
 		}
-		addDB(localip, *keepPtr, *logPtr, *projectPtr, DBIP, *slugPtr, UTCtime(), *toolPtr, user)
+		err := addDB(localip, *keepPtr, *logPtr, *projectPtr, DBIP, *slugPtr, UTCtime(), *toolPtr, user)
+		if err != nil {
+			log.Fatal("DB장애로 로그를 추가할 수 없습니다.")
+		}
 	} else if *findPtr != "" {
 		//find mode
 		fmt.Printf("%-25s %-04s %-15s %-20s %-10s %-10s %-14s %s\n","Time", "Keep", "IP","User","Tool","Project","Slug","Log")

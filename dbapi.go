@@ -8,6 +8,7 @@ import (
 	"runtime"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	"log"
 )
 
 type Log struct {
@@ -28,18 +29,19 @@ func genid() string {
 	return strconv.Itoa(int(time.Now().UnixNano() / int64(time.Millisecond)))
 }
 
-func addDB(cip, keep, log, project, sip, slug, time, tool, user string){
+func addDB(cip, keep, logstr, project, sip, slug, time, tool, user string) error {
 	session, err := mgo.Dial(DBIP)
 	if err != nil {
-		os.Exit(1)
-		}
+		log.Println("DB Connect Err : ", err)
+		return err
+	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("dilog").C("log")
 	doc := Log{ Cip: cip,
 				Id: genid(),
 				Keep: keep,
-				Log: log,
+				Log: logstr,
 				Os: runtime.GOOS,
 				Project: project,
 				Sip: sip,
@@ -50,8 +52,10 @@ func addDB(cip, keep, log, project, sip, slug, time, tool, user string){
 				}
 	err = c.Insert(doc)
 	if err != nil {
-		os.Exit(1)
+		log.Println("DB Insert Err : ", err)
+		return err
 	}
+	return nil
 }
 
 func allDB() []Log {
