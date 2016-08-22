@@ -58,6 +58,8 @@ func www_root(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	var logs []Log
+	io.WriteString(w, headHTML + infoHTML("","","") + searchboxHTML(searchword) + logHTML(logs))
 }
 
 func webserver(port string) {
