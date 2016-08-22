@@ -89,26 +89,31 @@ func findtDB(toolname string) ([]Log, error) {
 	c :=  session.DB("dilog").C("log")
 	err = c.Find(bson.M{"tool": &bson.RegEx{Pattern: toolname, Options: "i"}}).Sort("-time").All(&results)
 	if err != nil {
-		log.Println("DB Connect Err : ", err)
+		log.Println("DB Find Err : ", err)
 		return results, err
 	}
 	return results, nil
 }
 
-func findtpDB(toolname,project string) []Log {
+func findtpDB(toolname,project string) ([]Log, error) {
 	var results []Log
 	session, err := mgo.Dial(DBIP)
 	if err != nil {
-		os.Exit(1)
+		log.Println("DB Connect Err : ", err)
+		return results, err
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	c :=  session.DB("dilog").C("log")
-	c.Find(bson.M{"$and": []bson.M {
+	err = c.Find(bson.M{"$and": []bson.M {
 			bson.M{"tool": &bson.RegEx{Pattern: toolname, Options: "i"}},
 			bson.M{"project": &bson.RegEx{Pattern: project, Options: "i"}},
 		}}).Sort("-time").All(&results)
-	return results
+	if err != nil {
+		log.Println("DB Find Err : ", err)
+		return results, err
+	}
+	return results, nil
 }
 
 

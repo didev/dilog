@@ -8,13 +8,13 @@ import (
 )
 
 func www_root(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html",)
 	var searchword string = ""
 	var tool string = ""
 	var project string = ""
 	var slug string = ""
 	var urllist []string
 	var logs []Log
-	w.Header().Set("Content-Type", "text/html",)
 	searchword = r.FormValue("searchword")
 	urllist = strings.Split(r.URL.Path, "/")
 
@@ -28,7 +28,11 @@ func www_root(w http.ResponseWriter, r *http.Request) {
 	} else if len(urllist) == 4 {
 		project = urllist[3]
 		tool = urllist[2]
-		logs = findtpDB(tool, project)
+		logs, err := findtpDB(tool, project)
+		if err != nil {
+			io.WriteString(w, headHTML + "<br><center>DB 또는 네트워크 장애로 로그를 가지고 올 수 없습니다.</center>")
+			return
+		}
 		io.WriteString(w, headHTML + infoHTML(tool, project,"") + searchboxHTML(searchword) + logHTML(logs))
 		return
 	} else if len(urllist) == 3 {
