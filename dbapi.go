@@ -244,18 +244,18 @@ func findDB(searchword string) ([]Log, error) {
 }
 
 
-func findnumDB(searchword string) int {
-	var results []Log
+func findnumDB(searchword string) (int, error) {
 	var wordlist []string
 	session, err := mgo.Dial(DBIP)
 	if err != nil {
-		os.Exit(1)
+		log.Println("DB Find Err : ", err)
+		return 0, err
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	c :=  session.DB("dilog").C("log")
 	if len(strings.Split(searchword, " ")) == 1 {
-		c.Find(bson.M{"$or": []bson.M {
+		num, err := c.Find(bson.M{"$or": []bson.M {
 				bson.M{"cip": &bson.RegEx{Pattern: searchword, Options: "i"}},
 				bson.M{"id":  &bson.RegEx{Pattern: searchword, Options: "i"}},
 				bson.M{"log": &bson.RegEx{Pattern: searchword, Options: "i"}},
@@ -265,10 +265,15 @@ func findnumDB(searchword string) int {
 				bson.M{"time": &bson.RegEx{Pattern: searchword, Options: "i"}},
 				bson.M{"tool": &bson.RegEx{Pattern: searchword, Options: "i"}},
 				bson.M{"user": &bson.RegEx{Pattern: searchword, Options: "i"}},
-				}}).All(&results)
+				}}).Count()
+		if err != nil {
+			log.Println("DB Find Err : ", err)
+			return 0, err
+		}
+		return num, nil
 	} else if len(strings.Split(searchword, " ")) == 2 {
 		wordlist = strings.Split(searchword, " ")
-		c.Find(bson.M{"$and": []bson.M {
+		num, err := c.Find(bson.M{"$and": []bson.M {
 				bson.M{"$or": []bson.M {
 				bson.M{"cip": &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
 				bson.M{"id":  &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
@@ -292,10 +297,15 @@ func findnumDB(searchword string) int {
 				bson.M{"user": &bson.RegEx{Pattern: wordlist[1], Options: "i"}},
 				}},
 			},
-		}).All(&results)
+		}).Count()
+		if err != nil {
+			log.Println("DB Find Err : ", err)
+			return 0, err
+		}
+		return num, nil
 	} else {
 		wordlist = strings.Split(searchword, " ")
-		c.Find(bson.M{"$and": []bson.M {
+		num, err := c.Find(bson.M{"$and": []bson.M {
 				bson.M{"$or": []bson.M {
 				bson.M{"cip": &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
 				bson.M{"id":  &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
@@ -329,9 +339,14 @@ func findnumDB(searchword string) int {
 				bson.M{"tool": &bson.RegEx{Pattern: wordlist[2], Options: "i"}},
 				bson.M{"user": &bson.RegEx{Pattern: wordlist[2], Options: "i"}},
 				}},
-		}}).All(&results)
+		}}).Count()
+		if err != nil {
+			log.Println("DB Find Err : ", err)
+			return 0, err
+		}
+		return num, nil
 	}
-	return len(results)
+	return 0, nil
 }
 
 func rmDB(id string) bool {

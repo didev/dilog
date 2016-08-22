@@ -89,7 +89,11 @@ func main() {
 			fmt.Printf("%-25s %-4s %-15s %-20s %-10s %-10s %-14s %s\n", i.Time, i.Keep, i.Cip, i.User, i.Tool, i.Project, i.Slug, i.Log)
 		}
 	} else if *findnumPtr != "" {
-		fmt.Printf("%d\n", findnumDB(*findnumPtr))
+		num, err := findnumDB(*findnumPtr)
+		if err != nil {
+			log.Fatal("DB장애로 처리할 수 없습니다.")
+		}
+		fmt.Printf("%d\n", num)
 
 	} else if *rmPtr == "temp" {
 		//remove mode
