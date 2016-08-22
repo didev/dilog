@@ -117,21 +117,26 @@ func findtpDB(toolname,project string) ([]Log, error) {
 }
 
 
-func findtpsDB(toolname,project,slug string) []Log {
+func findtpsDB(toolname,project,slug string) ([]Log, error) {
 	var results []Log
 	session, err := mgo.Dial(DBIP)
 	if err != nil {
-		os.Exit(1)
+		log.Println("DB Connect Err : ", err)
+		return results, err
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	c :=  session.DB("dilog").C("log")
-	c.Find(bson.M{"$and": []bson.M {
+	err = c.Find(bson.M{"$and": []bson.M {
 			bson.M{"tool": &bson.RegEx{Pattern: toolname, Options: "i"}},
 			bson.M{"project": &bson.RegEx{Pattern: project, Options: "i"}},
 			bson.M{"slug": &bson.RegEx{Pattern: slug, Options: "i"}},
 		}}).Sort("-time").All(&results)
-	return results
+	if err != nil {
+		log.Println("DB Find Err : ", err)
+		return results, err
+	}
+	return results, nil
 }
 
 
