@@ -140,18 +140,19 @@ func findtpsDB(toolname,project,slug string) ([]Log, error) {
 }
 
 
-func findDB(searchword string) []Log {
+func findDB(searchword string) ([]Log, error) {
 	var results []Log
 	var wordlist []string
 	session, err := mgo.Dial(DBIP)
 	if err != nil {
-		os.Exit(1)
+		log.Println("DB Connect Err : ", err)
+		return results, err
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	c :=  session.DB("dilog").C("log")
 	if len(strings.Split(searchword, " ")) == 1 {
-		c.Find(bson.M{"$or": []bson.M {
+		err = c.Find(bson.M{"$or": []bson.M {
 				bson.M{"cip": &bson.RegEx{Pattern: searchword, Options: "i"}},
 				bson.M{"id":  &bson.RegEx{Pattern: searchword, Options: "i"}},
 				bson.M{"log": &bson.RegEx{Pattern: searchword, Options: "i"}},
@@ -162,9 +163,13 @@ func findDB(searchword string) []Log {
 				bson.M{"tool": &bson.RegEx{Pattern: searchword, Options: "i"}},
 				bson.M{"user": &bson.RegEx{Pattern: searchword, Options: "i"}},
 				}}).Sort("-time").All(&results)
+		if err != nil {
+			log.Println("DB Find Err : ", err)
+			return results, err
+		}
 	} else if len(strings.Split(searchword, " ")) == 2 {
 		wordlist = strings.Split(searchword, " ")
-		c.Find(bson.M{"$and": []bson.M {
+		err = c.Find(bson.M{"$and": []bson.M {
 				bson.M{"$or": []bson.M {
 				bson.M{"cip": &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
 				bson.M{"id":  &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
@@ -189,9 +194,13 @@ func findDB(searchword string) []Log {
 				}},
 			},
 		}).Sort("-time").All(&results)
+		if err != nil {
+			log.Println("DB Find Err : ", err)
+			return results, err
+		}
 	} else {
 		wordlist = strings.Split(searchword, " ")
-		c.Find(bson.M{"$and": []bson.M {
+		err = c.Find(bson.M{"$and": []bson.M {
 				bson.M{"$or": []bson.M {
 				bson.M{"cip": &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
 				bson.M{"id":  &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
@@ -226,8 +235,12 @@ func findDB(searchword string) []Log {
 				bson.M{"user": &bson.RegEx{Pattern: wordlist[2], Options: "i"}},
 				}},
 		}}).Sort("-time").All(&results)
+		if err != nil {
+			log.Println("DB Find Err : ", err)
+			return results, err
+		}
 	}
-	return results
+	return results, nil
 }
 
 

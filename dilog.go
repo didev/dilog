@@ -81,7 +81,11 @@ func main() {
 					strings.Repeat("-",14),
 					strings.Repeat("-",20),
 				)
-		for _,i := range findDB(*findPtr) {
+		items, err := findDB(*findPtr)
+		if err != nil {
+			log.Fatal("DB장애로 처리할 수 없습니다.")
+		}
+		for _,i := range items {
 			fmt.Printf("%-25s %-4s %-15s %-20s %-10s %-10s %-14s %s\n", i.Time, i.Keep, i.Cip, i.User, i.Tool, i.Project, i.Slug, i.Log)
 		}
 	} else if *findnumPtr != "" {

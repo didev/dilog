@@ -50,7 +50,11 @@ func www_root(w http.ResponseWriter, r *http.Request) {
 		return
 	}  else {
 		if searchword != "" {
-			logs = findDB(searchword)
+			logs, err = findDB(searchword)
+			if err != nil {
+				io.WriteString(w, headHTML + "<br><center>DB 또는 네트워크 장애로 로그를 가지고 올 수 없습니다.</center>")
+				return
+			}
 		}
 		io.WriteString(w, headHTML + infoHTML("","","") + searchboxHTML(searchword) + logHTML(logs))
 		return
