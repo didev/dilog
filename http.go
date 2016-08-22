@@ -3,7 +3,6 @@ package main
 import (
 	"io"
 	"fmt"
-	//"net"
 	"net/http"
 	"strings"
 )
@@ -25,20 +24,24 @@ func www_root(w http.ResponseWriter, r *http.Request) {
 		tool = urllist[2]
 		logs = findtpsDB(tool, project, slug)
 		io.WriteString(w, headHTML + infoHTML(tool,project,slug) + searchboxHTML(searchword)+logHTML(logs))
+		return
 	} else if len(urllist) == 4 {
 		project = urllist[3]
 		tool = urllist[2]
 		logs = findtpDB(tool, project)
 		io.WriteString(w, headHTML + infoHTML(tool, project,"") + searchboxHTML(searchword) + logHTML(logs))
+		return
 	} else if len(urllist) == 3 {
 		tool = urllist[2]
 		logs = findtDB(tool)
 		io.WriteString(w, headHTML + infoHTML(tool,"","") + searchboxHTML(searchword) + logHTML(logs))
+		return
 	}  else {
 		if searchword != "" {
 			logs = findDB(searchword)
 		}
 		io.WriteString(w, headHTML + infoHTML("","","") + searchboxHTML(searchword) + logHTML(logs))
+		return
 	}
 }
 
