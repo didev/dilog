@@ -1,7 +1,6 @@
 package main
 
 import (
-	"os"
 	"time"
 	"strconv"
 	"strings"
@@ -349,17 +348,19 @@ func findnumDB(searchword string) (int, error) {
 	return 0, nil
 }
 
-func rmDB(id string) bool {
+func rmDB(id string) (bool, error) {
 	session, err := mgo.Dial(DBIP)
 	if err != nil {
-		os.Exit(1)
+		log.Println("DB Connet Err : ", err)
+		return false, err
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	err = session.DB("dilog").C("log").Remove(bson.M{"id":id})
-	if err == nil {
-		return true
-	} else {
-		return false
+	if err != nil {
+		log.Println("DB Remove Err : ", err)
+		return false, err
 	}
+	return true, nil
+
 }

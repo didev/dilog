@@ -103,7 +103,15 @@ func main() {
 		}
 		for _, i := range itemlist {
 			if timecheck(i.Time, i.Keep) {
-				rmDB(i.Id)
+				rmbool, err := rmDB(i.Id)
+				if err != nil {
+					log.Fatal("DB장애로 처리할 수 없습니다.")
+				}
+				if rmbool {
+					return
+				} else {
+					fmt.Println("해당 slug를 삭제할 수 없습니다.")
+				}
 			}
 		}
 	} else if *httpPtr != "" {
