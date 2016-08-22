@@ -89,7 +89,11 @@ func main() {
 
 	} else if *rmPtr == "temp" {
 		//remove mode
-		for _, i := range allDB() {
+		itemlist, err := allDB()
+		if err != nil {
+			log.Fatal("DB장애로 처리할 수 없습니다.")
+		}
+		for _, i := range itemlist {
 			if timecheck(i.Time, i.Keep) {
 				rmDB(i.Id)
 			}

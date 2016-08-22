@@ -58,17 +58,22 @@ func addDB(cip, keep, logstr, project, sip, slug, time, tool, user string) error
 	return nil
 }
 
-func allDB() []Log {
+func allDB() ([]Log, error) {
 	var results []Log
 	session, err := mgo.Dial(DBIP)
 	if err != nil {
-		os.Exit(1)
+		log.Println("DB Connect Err : ", err)
+		return results, err
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("dilog").C("log")
-	c.Find(bson.M{}).All(&results)
-	return results
+	err = c.Find(bson.M{}).All(&results)
+	if err != nil {
+		log.Println("DB Find Err : ", err)
+		return results, err
+	}
+	return results, nil
 }
 
 
