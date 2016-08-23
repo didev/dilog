@@ -58,51 +58,51 @@ func addDB(cip, keep, logstr, project, sip, slug, time, tool, user string) error
 }
 
 func allDB() ([]Log, error) {
-	var results []Log
 	session, err := mgo.Dial(DBIP)
 	if err != nil {
 		log.Println("DB Connect Err : ", err)
-		return results, err
+		return nil, err
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
+	var results []Log
 	c := session.DB("dilog").C("log")
 	err = c.Find(bson.M{}).All(&results)
 	if err != nil {
 		log.Println("DB Find Err : ", err)
-		return results, err
+		return nil, err
 	}
 	return results, nil
 }
 
 
 func findtDB(toolname string) ([]Log, error) {
-	var results []Log
 	session, err := mgo.Dial(DBIP)
 	if err != nil {
 		log.Println("DB Connect Err : ", err)
-		return results, err
+		return nil, err
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
+	var results []Log
 	c :=  session.DB("dilog").C("log")
 	err = c.Find(bson.M{"tool": &bson.RegEx{Pattern: toolname, Options: "i"}}).Sort("-time").All(&results)
 	if err != nil {
 		log.Println("DB Find Err : ", err)
-		return results, err
+		return nil, err
 	}
 	return results, nil
 }
 
 func findtpDB(toolname,project string) ([]Log, error) {
-	var results []Log
 	session, err := mgo.Dial(DBIP)
 	if err != nil {
 		log.Println("DB Connect Err : ", err)
-		return results, err
+		return nil, err
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
+	var results []Log
 	c :=  session.DB("dilog").C("log")
 	err = c.Find(bson.M{"$and": []bson.M {
 			bson.M{"tool": &bson.RegEx{Pattern: toolname, Options: "i"}},
@@ -110,21 +110,21 @@ func findtpDB(toolname,project string) ([]Log, error) {
 		}}).Sort("-time").All(&results)
 	if err != nil {
 		log.Println("DB Find Err : ", err)
-		return results, err
+		return nil, err
 	}
 	return results, nil
 }
 
 
 func findtpsDB(toolname,project,slug string) ([]Log, error) {
-	var results []Log
 	session, err := mgo.Dial(DBIP)
 	if err != nil {
 		log.Println("DB Connect Err : ", err)
-		return results, err
+		return nil, err
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
+	var results []Log
 	c :=  session.DB("dilog").C("log")
 	err = c.Find(bson.M{"$and": []bson.M {
 			bson.M{"tool": &bson.RegEx{Pattern: toolname, Options: "i"}},
@@ -133,22 +133,22 @@ func findtpsDB(toolname,project,slug string) ([]Log, error) {
 		}}).Sort("-time").All(&results)
 	if err != nil {
 		log.Println("DB Find Err : ", err)
-		return results, err
+		return nil, err
 	}
 	return results, nil
 }
 
 
 func findDB(searchword string) ([]Log, error) {
-	var results []Log
-	var wordlist []string
 	session, err := mgo.Dial(DBIP)
 	if err != nil {
 		log.Println("DB Connect Err : ", err)
-		return results, err
+		return nil, err
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
+	var results []Log
+	var wordlist []string
 	c :=  session.DB("dilog").C("log")
 	if len(strings.Split(searchword, " ")) == 1 {
 		err = c.Find(bson.M{"$or": []bson.M {
@@ -164,7 +164,7 @@ func findDB(searchword string) ([]Log, error) {
 				}}).Sort("-time").All(&results)
 		if err != nil {
 			log.Println("DB Find Err : ", err)
-			return results, err
+			return nil, err
 		}
 	} else if len(strings.Split(searchword, " ")) == 2 {
 		wordlist = strings.Split(searchword, " ")
@@ -195,7 +195,7 @@ func findDB(searchword string) ([]Log, error) {
 		}).Sort("-time").All(&results)
 		if err != nil {
 			log.Println("DB Find Err : ", err)
-			return results, err
+			return nil, err
 		}
 	} else {
 		wordlist = strings.Split(searchword, " ")
@@ -236,7 +236,7 @@ func findDB(searchword string) ([]Log, error) {
 		}}).Sort("-time").All(&results)
 		if err != nil {
 			log.Println("DB Find Err : ", err)
-			return results, err
+			return nil, err
 		}
 	}
 	return results, nil
