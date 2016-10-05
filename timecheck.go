@@ -19,5 +19,5 @@ func timecheck(timestr, keepdate string) bool {
 	alltime, _ := time.ParseDuration(keepdate + "h")
 	addtime := recordtime.Add(alltime * 24)
 	now := time.Now()
-	return now.After(addtime) //if true then remove
+	return now.After(addtime) //추후 이 결과를 이용해서 참이면 리무브 대상이다.
 }
