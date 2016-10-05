@@ -13,12 +13,8 @@ import (
 
 const DBIP = "10.0.90.251"
 
-func UTCtime() string {
-	now := time.Now().String()
-	date := strings.Split(now, " ")[0]
-	time := strings.Split(now, " ")[1][0:5]
-	utc := strings.Split(now, " ")[2]
-	return fmt.Sprintf("%s %s UTC%s", date, time, utc)
+func Now() string {
+	return time.Now().Format(time.RFC3339)
 }
 
 func username() string {
@@ -64,7 +60,7 @@ func main() {
 		} else {
 			user = *userPtr
 		}
-		err := addDB(localip, *keepPtr, *logPtr, *projectPtr, DBIP, *slugPtr, UTCtime(), *toolPtr, user)
+		err := addDB(localip, *keepPtr, *logPtr, *projectPtr, DBIP, *slugPtr, Now(), *toolPtr, user)
 		if err != nil {
 			log.Fatal("DB장애로 로그를 추가할 수 없습니다.")
 		}
@@ -105,7 +101,7 @@ func main() {
 			if timecheck(i.Time, i.Keep) {
 				rmbool, err := rmDB(i.Id)
 				if err != nil {
-					log.Fatal("DB장애로 처리할 수 없습니다.")
+					log.Fatal(err)
 				}
 				if rmbool {
 					return

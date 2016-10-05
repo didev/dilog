@@ -36,7 +36,7 @@ func addDB(cip, keep, logstr, project, sip, slug, time, tool, user string) error
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
-	c := session.DB("dilog").C("log")
+	c := session.DB("dilog").C("logs")
 	doc := Log{ Cip: cip,
 				Id: genid(),
 				Keep: keep,
@@ -66,7 +66,7 @@ func allDB() ([]Log, error) {
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	var results []Log
-	c := session.DB("dilog").C("log")
+	c := session.DB("dilog").C("logs")
 	err = c.Find(bson.M{}).All(&results)
 	if err != nil {
 		log.Println("DB Find Err : ", err)
@@ -85,7 +85,7 @@ func findtDB(toolname string) ([]Log, error) {
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	var results []Log
-	c :=  session.DB("dilog").C("log")
+	c :=  session.DB("dilog").C("logs")
 	err = c.Find(bson.M{"tool": &bson.RegEx{Pattern: toolname, Options: "i"}}).Sort("-time").All(&results)
 	if err != nil {
 		log.Println("DB Find Err : ", err)
@@ -103,7 +103,7 @@ func findtpDB(toolname,project string) ([]Log, error) {
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	var results []Log
-	c :=  session.DB("dilog").C("log")
+	c :=  session.DB("dilog").C("logs")
 	err = c.Find(bson.M{"$and": []bson.M {
 			bson.M{"tool": &bson.RegEx{Pattern: toolname, Options: "i"}},
 			bson.M{"project": &bson.RegEx{Pattern: project, Options: "i"}},
@@ -125,7 +125,7 @@ func findtpsDB(toolname,project,slug string) ([]Log, error) {
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	var results []Log
-	c :=  session.DB("dilog").C("log")
+	c :=  session.DB("dilog").C("logs")
 	err = c.Find(bson.M{"$and": []bson.M {
 			bson.M{"tool": &bson.RegEx{Pattern: toolname, Options: "i"}},
 			bson.M{"project": &bson.RegEx{Pattern: project, Options: "i"}},
@@ -149,7 +149,7 @@ func findDB(searchword string) ([]Log, error) {
 	session.SetMode(mgo.Monotonic, true)
 	var results []Log
 	var wordlist []string
-	c :=  session.DB("dilog").C("log")
+	c :=  session.DB("dilog").C("logs")
 	if len(strings.Split(searchword, " ")) == 1 {
 		err = c.Find(bson.M{"$or": []bson.M {
 				bson.M{"cip": &bson.RegEx{Pattern: searchword, Options: "i"}},
@@ -252,7 +252,7 @@ func findnumDB(searchword string) (int, error) {
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
-	c :=  session.DB("dilog").C("log")
+	c :=  session.DB("dilog").C("logs")
 	if len(strings.Split(searchword, " ")) == 1 {
 		num, err := c.Find(bson.M{"$or": []bson.M {
 				bson.M{"cip": &bson.RegEx{Pattern: searchword, Options: "i"}},
@@ -356,7 +356,7 @@ func rmDB(id string) (bool, error) {
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
-	err = session.DB("dilog").C("log").Remove(bson.M{"id":id})
+	err = session.DB("dilog").C("logs").Remove(bson.M{"id":id})
 	if err != nil {
 		log.Println("DB Remove Err : ", err)
 		return false, err
