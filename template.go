@@ -101,10 +101,10 @@ func infoHTML(tool, project, slug string) string {
 		result = "Info : " + tool
 	}
 	if project != "" {
-		result = result +" > "+ project
+		result = result + " > " + project
 	}
 	if slug != "" {
-		result = result +" > "+ slug
+		result = result + " > " + slug
 	}
 	if result == "" {
 		return `<div class="info">&nbsp;</div><br>`
@@ -130,7 +130,6 @@ func flength(text string, length int) string {
 	}
 }
 
-
 func title() string {
 	return fmt.Sprintf(`<br><div class="title">%s%s
 						%s%s
@@ -140,14 +139,14 @@ func title() string {
 						%s%s
 						%s%s
 						%s</div><br><br>`,
-			"Time",flength("Time",26),
-			"Keep",flength("Keep",5),
-			"IP",flength("IP",14),
-			"User",flength("User",19),
-			"Tool",flength("Tool",11),
-			"Project",flength("Project",11),
-			"Slug",flength("Slug",15),
-			"Log")
+		"Time", flength("Time", 26),
+		"Keep", flength("Keep", 5),
+		"IP", flength("IP", 14),
+		"User", flength("User", 19),
+		"Tool", flength("Tool", 11),
+		"Project", flength("Project", 11),
+		"Slug", flength("Slug", 15),
+		"Log")
 }
 
 func linktool(tool string) string {
@@ -197,14 +196,14 @@ func log2tag(log Log) string {
 						%s%s&nbsp;
 						%s%s&nbsp;
 						%s</div><br>`,
-			log.Time,
-			log.Keep, flength(log.Keep,4),
-			log.Cip, flength(log.Cip,13),
-			log.User, flength(log.User,18),
-			linktool(log.Tool), flength(log.Tool,10),
-			linkproject(log.Tool, log.Project), flength(log.Project,10),
-			linkslug(log.Tool, log.Project, log.Slug), flength(log.Slug,14),
-			linklog(log.Log))
+		log.Time,
+		log.Keep, flength(log.Keep, 4),
+		log.Cip, flength(log.Cip, 13),
+		log.User, flength(log.User, 18),
+		linktool(log.Tool), flength(log.Tool, 10),
+		linkproject(log.Tool, log.Project), flength(log.Project, 10),
+		linkslug(log.Tool, log.Project, log.Slug), flength(log.Slug, 14),
+		linklog(log.Log))
 }
 
 func logHTML(logs []Log) string {

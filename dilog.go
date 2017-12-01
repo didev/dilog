@@ -2,14 +2,14 @@ package main
 
 import (
 	"flag"
-	"time"
 	"fmt"
+	"log"
+	"os"
 	"os/user"
 	"runtime"
-	"os"
 	"strings"
-	"log"
-	)
+	"time"
+)
 
 const DBIP = "10.0.90.251"
 
@@ -49,7 +49,7 @@ func main() {
 
 	flag.Parse()
 
-	if *toolPtr != "" && *logPtr != "" && *httpPtr == ""{
+	if *toolPtr != "" && *logPtr != "" && *httpPtr == "" {
 		if *ipPtr == "" {
 			localip = LocalIP()
 		} else {
@@ -66,22 +66,22 @@ func main() {
 		}
 	} else if *findPtr != "" {
 		//find mode
-		fmt.Printf("%-25s %-04s %-15s %-20s %-10s %-10s %-14s %s\n","Time", "Keep", "IP","User","Tool","Project","Slug","Log")
+		fmt.Printf("%-25s %-04s %-15s %-20s %-10s %-10s %-14s %s\n", "Time", "Keep", "IP", "User", "Tool", "Project", "Slug", "Log")
 		fmt.Printf("%-25s %-04s %-15s %-20s %-10s %-10s %-14s %s\n",
-					strings.Repeat("-",25),
-					strings.Repeat("-", 4),
-					strings.Repeat("-",15),
-					strings.Repeat("-",20),
-					strings.Repeat("-",10),
-					strings.Repeat("-",10),
-					strings.Repeat("-",14),
-					strings.Repeat("-",20),
-				)
+			strings.Repeat("-", 25),
+			strings.Repeat("-", 4),
+			strings.Repeat("-", 15),
+			strings.Repeat("-", 20),
+			strings.Repeat("-", 10),
+			strings.Repeat("-", 10),
+			strings.Repeat("-", 14),
+			strings.Repeat("-", 20),
+		)
 		items, err := findDB(*findPtr)
 		if err != nil {
 			log.Fatal("DB장애로 처리할 수 없습니다.")
 		}
-		for _,i := range items {
+		for _, i := range items {
 			fmt.Printf("%-25s %-4s %-15s %-20s %-10s %-10s %-14s %s\n", i.Time, i.Keep, i.Cip, i.User, i.Tool, i.Project, i.Slug, i.Log)
 		}
 	} else if *findnumPtr != "" {

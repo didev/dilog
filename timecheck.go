@@ -1,10 +1,9 @@
 package main
 
 import (
-	"time"
 	"log"
-	)
-
+	"time"
+)
 
 func str2time(str string) time.Time {
 	t, err := time.Parse(time.RFC3339, str)
