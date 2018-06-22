@@ -60,7 +60,7 @@ func main() {
 		} else {
 			user = *userPtr
 		}
-		err := addDB(localip, *keepPtr, *logPtr, *projectPtr, DBIP, *slugPtr, Now(), *toolPtr, user)
+		err := addDB(localip, "", *keepPtr, *logPtr, *projectPtr, *slugPtr, Now(), *toolPtr, user)
 		if err != nil {
 			log.Fatal("DB장애로 로그를 추가할 수 없습니다.")
 		}

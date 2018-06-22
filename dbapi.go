@@ -10,25 +10,11 @@ import (
 	"time"
 )
 
-type Log struct {
-	Cip     string
-	Id      string
-	Keep    string
-	Log     string
-	Os      string
-	Project string
-	Sip     string
-	Slug    string
-	Time    string
-	Tool    string
-	User    string
-}
-
 func genid() string {
 	return strconv.Itoa(int(time.Now().UnixNano() / int64(time.Millisecond)))
 }
 
-func addDB(cip, keep, logstr, project, sip, slug, time, tool, user string) error {
+func addDB(cip, port, keep, logstr, project, slug, time, tool, user string) error {
 	session, err := mgo.Dial(DBIP)
 	if err != nil {
 		log.Println("DB Connect Err : ", err)
@@ -38,12 +24,12 @@ func addDB(cip, keep, logstr, project, sip, slug, time, tool, user string) error
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("dilog").C("logs")
 	doc := Log{Cip: cip,
+		Port:    port,
 		Id:      genid(),
 		Keep:    keep,
 		Log:     logstr,
 		Os:      runtime.GOOS,
 		Project: project,
-		Sip:     sip,
 		Slug:    slug,
 		Time:    time,
 		Tool:    tool,
@@ -341,7 +327,6 @@ func findnumDB(searchword string) (int, error) {
 		}
 		return num, nil
 	}
-	return 0, nil
 }
 
 func rmDB(id string) (bool, error) {
