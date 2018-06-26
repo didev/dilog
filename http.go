@@ -81,7 +81,6 @@ func handleApiSetLog(w http.ResponseWriter, r *http.Request) {
 	var log string
 	var project string
 	var slug string
-	var time string
 	var tool string
 	var user string
 	ip, port, err := net.SplitHostPort(r.RemoteAddr)
