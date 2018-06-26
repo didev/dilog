@@ -109,7 +109,7 @@ func main() {
 				}
 			}
 		}
-	} else if *httpPtr != "" {
+	} else if regexpPort.MatchString(*httpPtr) {
 		//web server mode.
 		webserver(*httpPtr)
 	} else {
