@@ -44,7 +44,7 @@ $ dilog -http=:8080
 $ curl -X POST -d "project=TEMP&slug=SS_0010_org&tool=csi3&user=d10191&keep=180&log=log_text" http://http://10.0.90.251:8080/api/setlog
 ```
 
-#### 실행방법
+#### 웹서버 실행방법
 ```
 # dilog -http :80
 ```
