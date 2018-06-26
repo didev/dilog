@@ -58,7 +58,7 @@ func main() {
 		// MPAA를 대비하기 위해선, 로그기록시 IP, Port가 DB에 저장되는 것이 좋다.
 		// Port는 restAPI 퀘스트 헤더에 존재하는데, 현재 많은 툴에서 사용중인 dilog의 cmd모드는 제거하고 restAPI만 남기면 좋다.
 
-		port = "" // 기존 cmd방식을 유지하기 위해서 빈문자열을 설정함.
+		port := "" // 기존 cmd방식을 유지하기 위해서 빈문자열을 설정함.
 		err := addDB(localip, port, *keepPtr, *logPtr, *projectPtr, *slugPtr, *toolPtr, user)
 		if err != nil {
 			log.Fatal("DB장애로 로그를 추가할 수 없습니다.")

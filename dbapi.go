@@ -5,7 +5,6 @@ import (
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"log"
-	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -29,7 +28,6 @@ func addDB(cip, port, keep, logstr, project, slug, tool, user string) error {
 		Id:      genid(),
 		Keep:    keep,
 		Log:     logstr,
-		Os:      runtime.GOOS,
 		Project: project,
 		Slug:    slug,
 		Time:    ditime.Now(),
