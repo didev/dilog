@@ -122,13 +122,6 @@ func handleApiSetLog(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			slug = v
-		case "time":
-			v, err := PostFormValueInList(key, value)
-			if err != nil {
-				fmt.Fprintln(w, err)
-				return
-			}
-			time = v
 		case "tool":
 			v, err := PostFormValueInList(key, value)
 			if err != nil {
@@ -145,7 +138,7 @@ func handleApiSetLog(w http.ResponseWriter, r *http.Request) {
 			user = v
 		}
 	}
-	err = addDB(ip, port, keep, log, project, slug, time, tool, user)
+	err = addDB(ip, port, keep, log, project, slug, tool, user)
 	if err != nil {
 		fmt.Fprintln(w, err)
 	}

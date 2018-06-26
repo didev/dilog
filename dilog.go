@@ -8,14 +8,9 @@ import (
 	"os/user"
 	"runtime"
 	"strings"
-	"time"
 )
 
 const DBIP = "10.0.90.251"
-
-func Now() string {
-	return time.Now().Format(time.RFC3339)
-}
 
 func username() string {
 	user, err := user.Current()
@@ -60,7 +55,7 @@ func main() {
 		} else {
 			user = *userPtr
 		}
-		err := addDB(localip, "", *keepPtr, *logPtr, *projectPtr, *slugPtr, Now(), *toolPtr, user)
+		err := addDB(localip, "", *keepPtr, *logPtr, *projectPtr, *slugPtr, *toolPtr, user)
 		if err != nil {
 			log.Fatal("DB장애로 로그를 추가할 수 없습니다.")
 		}

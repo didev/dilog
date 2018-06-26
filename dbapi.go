@@ -1,6 +1,7 @@
 package main
 
 import (
+	"di/ditime"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"log"
@@ -14,7 +15,7 @@ func genid() string {
 	return strconv.Itoa(int(time.Now().UnixNano() / int64(time.Millisecond)))
 }
 
-func addDB(cip, port, keep, logstr, project, slug, time, tool, user string) error {
+func addDB(cip, port, keep, logstr, project, slug, tool, user string) error {
 	session, err := mgo.Dial(DBIP)
 	if err != nil {
 		log.Println("DB Connect Err : ", err)
@@ -31,7 +32,7 @@ func addDB(cip, port, keep, logstr, project, slug, time, tool, user string) erro
 		Os:      runtime.GOOS,
 		Project: project,
 		Slug:    slug,
-		Time:    time,
+		Time:    ditime.Now(),
 		Tool:    tool,
 		User:    user,
 	}
