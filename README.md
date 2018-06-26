@@ -37,6 +37,13 @@ $ dilog -rm temp
 $ dilog -http=:8080
 ```
 
+#### RestAPI 사용법
+- curl을 이용해서 로그를 POST하는 방법
+
+```
+$ curl -X POST -d "project=TEMP&slug=SS_0010_org&tool=csi3&user=d10191&keep=180&log=log_text" http://http://10.0.90.251:8080/api/setlog
+```
+
 #### 실행방법
 ```
 # dilog -http :80
