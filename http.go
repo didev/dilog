@@ -142,7 +142,6 @@ func handleApiSetLog(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Fprintln(w, err)
 	}
-	fmt.Println(ip, port, keep, log, project, slug, time, tool, user)
 }
 
 func webserver(port string) {
