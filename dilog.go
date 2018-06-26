@@ -113,7 +113,7 @@ func main() {
 		//web server mode.
 		webserver(*httpPtr)
 	} else {
-		fmt.Println("Digitalidea log utility")
+		fmt.Println("digitalidea log server")
 		flag.PrintDefaults()
 	}
 }
