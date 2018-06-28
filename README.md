@@ -37,7 +37,14 @@ $ dilog -rm temp
 $ dilog -http=:8080
 ```
 
-#### 실행방법
+#### RestAPI 사용법
+- curl을 이용해서 로그를 POST하는 방법
+
+```
+$ curl -X POST -d "project=TEMP&slug=SS_0010_org&tool=csi3&user=d10191&keep=180&log=log_text" http://http://10.0.90.251:8080/api/setlog
+```
+
+#### 웹서버 실행방법
 ```
 # dilog -http :80
 ```
@@ -48,6 +55,7 @@ $ sh build.sh
 ```
 
 #### HISTORY
+- '18.6.26 : RestAPI 추가
 - '16.4.8 : 회사 확장에 따라 로그시간을 국제시로 변경.
 - '15.5.26 ~ '15.6.11 : 로그서버 CSI 특허준비와 같이 문서작성.
 - '15.3.24 ~ '15.5.26: 설계, 1차 완료
