@@ -108,9 +108,8 @@ func infoHTML(tool, project, slug string) string {
 	}
 	if result == "" {
 		return `<div class="info">&nbsp;</div><br>`
-	} else {
-		return `<div class="info">` + result + "</div><br>"
 	}
+	return `<div class="info">` + result + "</div><br>"
 }
 
 func searchboxHTML(searchword string) string {
@@ -125,9 +124,8 @@ func flength(text string, length int) string {
 	if length >= len(text) {
 		spacenum := length - len(text)
 		return strings.Repeat("&nbsp;", spacenum)
-	} else {
-		return ""
 	}
+	return ""
 }
 
 func title() string {
@@ -152,25 +150,22 @@ func title() string {
 func linktool(tool string) string {
 	if tool != "" {
 		return fmt.Sprintf(`<a href="/log/%s">%s</a>`, tool, tool)
-	} else {
-		return ""
 	}
+	return ""
 }
 
 func linkproject(tool, project string) string {
 	if tool != "" && project != "" {
 		return fmt.Sprintf(`<a href="/log/%s/%s">%s</a>`, tool, project, project)
-	} else {
-		return project
 	}
+	return project
 }
 
 func linkslug(tool, project, slug string) string {
 	if tool != "" && project != "" && slug != "" {
 		return fmt.Sprintf(`<a href="/log/%s/%s/%s">%s</a>`, tool, project, slug, slug)
-	} else {
-		return slug
 	}
+	return slug
 }
 
 func linklog(log string) string {
@@ -207,7 +202,7 @@ func log2tag(log Log) string {
 }
 
 func logHTML(logs []Log) string {
-	var result string = ""
+	var result string
 	if len(logs) == 0 {
 		result = `<br><center><div class="noresult">No Result.</div></center>`
 	} else {

@@ -1,13 +1,13 @@
 package main
 
 import (
-	"di/ditime"
-	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
 	"log"
 	"strconv"
 	"strings"
 	"time"
+
+	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 )
 
 func genid() string {
@@ -23,14 +23,15 @@ func addDB(cip, port, keep, logstr, project, slug, tool, user string) error {
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("dilog").C("logs")
+	now := time.Now()
 	doc := Log{Cip: cip,
 		Port:    port,
-		Id:      genid(),
+		ID:      genid(),
 		Keep:    keep,
 		Log:     logstr,
 		Project: project,
 		Slug:    slug,
-		Time:    ditime.Now(),
+		Time:    now.Format(time.RFC3339),
 		Tool:    tool,
 		User:    user,
 	}

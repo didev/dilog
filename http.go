@@ -9,12 +9,12 @@ import (
 	"strings"
 )
 
-func www_root(w http.ResponseWriter, r *http.Request) {
+func root(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
-	var searchword string = ""
-	var tool string = ""
-	var project string = ""
-	var slug string = ""
+	var searchword string
+	var tool string
+	var project string
+	var slug string
 	var urllist []string
 	searchword = r.FormValue("searchword")
 	urllist = strings.Split(r.URL.Path, "/")
@@ -64,7 +64,7 @@ func www_root(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, headHTML+infoHTML("", "", "")+searchboxHTML(searchword)+logHTML(logs))
 }
 
-// PostFormValueInList는 PostForm 쿼리시 Value값이 1개라면 값을 리턴한다.
+// PostFormValueInList 는 PostForm 쿼리시 Value값이 1개라면 값을 리턴한다.
 func PostFormValueInList(key string, values []string) (string, error) {
 	if len(values) != 1 {
 		return "", errors.New(key + "값이 여러개 입니다.")
@@ -76,7 +76,11 @@ func PostFormValueInList(key string, values []string) (string, error) {
 }
 
 // handleApiSetLog 함수는 log를 등록하는 RestAPI이다.
-func handleApiSetLog(w http.ResponseWriter, r *http.Request) {
+func handleAPISetLog(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Post Only", http.StatusMethodNotAllowed)
+		return
+	}
 	var keep string
 	var log string
 	var project string
@@ -144,8 +148,8 @@ func handleApiSetLog(w http.ResponseWriter, r *http.Request) {
 }
 
 func webserver(port string) {
-	http.HandleFunc("/", www_root)
-	http.HandleFunc("/api/setlog", PostOnly(handleApiSetLog))
+	http.HandleFunc("/", root)
+	http.HandleFunc("/api/setlog", handleAPISetLog)
 	fmt.Printf("Web Server Start : http://%s%s\n", LocalIP(), port)
 	http.ListenAndServe(port, nil)
 }

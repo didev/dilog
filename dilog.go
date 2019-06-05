@@ -6,10 +6,14 @@ import (
 	"log"
 	"os"
 	"os/user"
+	"regexp"
 	"runtime"
 	"strings"
 )
 
+var regexpPort = regexp.MustCompile(`:\d{2,5}$`)
+
+// DBIP 상수는 사용하는 데이터베이스 아이피이다.
 const DBIP = "10.0.90.251"
 
 func username() string {
@@ -98,15 +102,15 @@ func main() {
 		}
 		for _, i := range itemlist {
 			if timecheck(i.Time, i.Keep) {
-				rmbool, err := rmDB(i.Id)
+				rmbool, err := rmDB(i.ID)
 				if err != nil {
 					log.Fatal(err)
 				}
 				if rmbool {
 					return
-				} else {
-					fmt.Println("해당 slug를 삭제할 수 없습니다.")
 				}
+				fmt.Println("해당 slug를 삭제할 수 없습니다.")
+				return
 			}
 		}
 	} else if regexpPort.MatchString(*httpPtr) {

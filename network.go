@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+// LocalIP 함수는 로컬아이피를 가지고 온다.
 func LocalIP() string {
 	hw, err := net.InterfaceAddrs()
 	var ip string
