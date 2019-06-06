@@ -1,4 +1,4 @@
-module /Users/kimhanwoong/dilog
+module github.com/digital-idea/dilog
 
 go 1.12
 

@@ -1,11 +1,11 @@
 # dilog
-- 디지털아이디어 로그서버이다.
 
-#### 기본정보
-- 개발일시 : '15.3.24
-- 관리부서 : 파이프라인
+![travisCI](https://secure.travis-ci.org/digital-idea/dilog.png)
 
-#### 로그추가(Commandline)
+디지털아이디어 웹용 로그서버 입니다.
+
+
+### 로그추가(Commandline)
 - 기본방법
 
 ```
