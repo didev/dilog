@@ -13,7 +13,7 @@ import (
 
 var (
 	regexpPort = regexp.MustCompile(`:\d{2,5}$`)
-	flagHTTP   = flag.String("http", ":8080", "dilog service port ex):8080")
+	flagHTTP   = flag.String("http", "", "dilog service port ex):8080")
 	flagDBIP   = flag.String("dbip", "127.0.0.1", "mongodb ip")
 	// add mode
 	flagTool    = flag.String("tool", "", "tool name")
@@ -47,21 +47,12 @@ func username() string {
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	flag.Parse()
-	// add mode
-	if *flagTool != "" && *flagLog != "" {
-		if *flagUser == "" {
-			*flagUser = username()
-		}
-		ip, err := serviceIP()
-		if err != nil {
-			log.Fatal(err)
-		}
-		err = addDB(ip, *flagLog, *flagProject, *flagSlug, *flagTool, *flagUser, *flagKeep)
-		if err != nil {
-			log.Fatal("DB장애로 로그를 추가할 수 없습니다.")
-		}
-	} else if *flagFind != "" {
-		//find mode
+	// webserver
+	if regexpPort.MatchString(*flagHTTP) {
+		webserver()
+	}
+	//find mode
+	if *flagFind != "" {
 		fmt.Printf("%-25s %-04s %-15s %-20s %-10s %-10s %-14s %s\n", "Time", "Keep", "IP", "User", "Tool", "Project", "Slug", "Log")
 		fmt.Printf("%-25s %-04s %-15s %-20s %-10s %-10s %-14s %s\n",
 			strings.Repeat("-", 25),
@@ -80,8 +71,10 @@ func main() {
 		for _, i := range items {
 			fmt.Printf("%-25s %-4d %-15s %-20s %-10s %-10s %-14s %s\n", i.Time, i.Keep, i.Cip, i.User, i.Tool, i.Project, i.Slug, i.Log)
 		}
-	} else if *flagRm {
-		//remove mode
+		return
+	}
+	//remove mode
+	if *flagRm {
 		itemlist, err := allDB()
 		if err != nil {
 			log.Fatal("DB장애로 처리할 수 없습니다.")
@@ -99,11 +92,23 @@ func main() {
 				return
 			}
 		}
-	} else if regexpPort.MatchString(*flagHTTP) {
-		webserver()
+		return
 	}
-	if *flagHelp {
-		fmt.Println("Digitalidea log server")
-		flag.PrintDefaults()
+	// add mode
+	if *flagTool != "" && *flagLog != "" {
+		if *flagUser == "" {
+			*flagUser = username()
+		}
+		ip, err := serviceIP()
+		if err != nil {
+			log.Fatal(err)
+		}
+		err = addDB(ip, *flagLog, *flagProject, *flagSlug, *flagTool, *flagUser, *flagKeep)
+		if err != nil {
+			log.Fatal("DB장애로 로그를 추가할 수 없습니다.")
+		}
+		return
 	}
+	fmt.Println("Digitalidea log server")
+	flag.PrintDefaults()
 }
