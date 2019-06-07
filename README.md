@@ -52,6 +52,9 @@ $ dilog -rm temp
 # dilog -http :80 -dbip 10.0.90.251
 ```
 
+#### Reference
+- vfxgen: https://github.com/shurcooL/vfsgen
+
 #### HISTORY
 - '18.6.26 : RestAPI 추가
 - '16.4.8 : 회사 확장에 따라 로그시간을 국제시로 변경.
