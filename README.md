@@ -49,7 +49,7 @@ $ dilog -rm temp
 #### 웹서버 실행방법
 - web서버를 80번 포트로 실행
 ```
-# dilog -http :80
+# dilog -http :80 -dbip 10.0.90.251
 ```
 
 #### HISTORY

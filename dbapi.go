@@ -14,8 +14,8 @@ func genid() string {
 	return strconv.Itoa(int(time.Now().UnixNano() / int64(time.Millisecond)))
 }
 
-func addDB(cip, port, keep, logstr, project, slug, tool, user string) error {
-	session, err := mgo.Dial(DBIP)
+func addDB(ip, keep, logstr, project, slug, tool, user string) error {
+	session, err := mgo.Dial(*flagDBIP)
 	if err != nil {
 		log.Println("DB Connect Err : ", err)
 		return err
@@ -24,8 +24,7 @@ func addDB(cip, port, keep, logstr, project, slug, tool, user string) error {
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("dilog").C("logs")
 	now := time.Now()
-	doc := Log{Cip: cip,
-		Port:    port,
+	doc := Log{Cip: ip,
 		ID:      genid(),
 		Keep:    keep,
 		Log:     logstr,
@@ -44,7 +43,7 @@ func addDB(cip, port, keep, logstr, project, slug, tool, user string) error {
 }
 
 func allDB() ([]Log, error) {
-	session, err := mgo.Dial(DBIP)
+	session, err := mgo.Dial(*flagDBIP)
 	if err != nil {
 		log.Println("DB Connect Err : ", err)
 		return nil, err
@@ -62,7 +61,7 @@ func allDB() ([]Log, error) {
 }
 
 func findtDB(toolname string) ([]Log, error) {
-	session, err := mgo.Dial(DBIP)
+	session, err := mgo.Dial(*flagDBIP)
 	if err != nil {
 		log.Println("DB Connect Err : ", err)
 		return nil, err
@@ -80,7 +79,7 @@ func findtDB(toolname string) ([]Log, error) {
 }
 
 func findtpDB(toolname, project string) ([]Log, error) {
-	session, err := mgo.Dial(DBIP)
+	session, err := mgo.Dial(*flagDBIP)
 	if err != nil {
 		log.Println("DB Connect Err : ", err)
 		return nil, err
@@ -101,7 +100,7 @@ func findtpDB(toolname, project string) ([]Log, error) {
 }
 
 func findtpsDB(toolname, project, slug string) ([]Log, error) {
-	session, err := mgo.Dial(DBIP)
+	session, err := mgo.Dial(*flagDBIP)
 	if err != nil {
 		log.Println("DB Connect Err : ", err)
 		return nil, err
@@ -123,7 +122,7 @@ func findtpsDB(toolname, project, slug string) ([]Log, error) {
 }
 
 func findDB(searchword string) ([]Log, error) {
-	session, err := mgo.Dial(DBIP)
+	session, err := mgo.Dial(*flagDBIP)
 	if err != nil {
 		log.Println("DB Connect Err : ", err)
 		return nil, err
@@ -227,7 +226,7 @@ func findDB(searchword string) ([]Log, error) {
 
 func findnumDB(searchword string) (int, error) {
 	var wordlist []string
-	session, err := mgo.Dial(DBIP)
+	session, err := mgo.Dial(*flagDBIP)
 	if err != nil {
 		log.Println("DB Find Err : ", err)
 		return 0, err
@@ -330,7 +329,7 @@ func findnumDB(searchword string) (int, error) {
 }
 
 func rmDB(id string) (bool, error) {
-	session, err := mgo.Dial(DBIP)
+	session, err := mgo.Dial(*flagDBIP)
 	if err != nil {
 		log.Println("DB Connet Err : ", err)
 		return false, err

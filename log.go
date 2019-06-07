@@ -3,7 +3,6 @@ package main
 // Log 자료구조 이다.
 type Log struct {
 	Cip     string // Client IP
-	Port    string // Client Port
 	ID      string // log ID
 	Keep    string // 보관일수
 	Log     string // 로그내용

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net"
 	"net/http"
 	"strings"
@@ -87,7 +88,7 @@ func handleAPISetLog(w http.ResponseWriter, r *http.Request) {
 	var slug string
 	var tool string
 	var user string
-	ip, port, err := net.SplitHostPort(r.RemoteAddr)
+	ip, _, err := net.SplitHostPort(r.RemoteAddr)
 	if err != nil {
 		fmt.Fprintln(w, err)
 		return
@@ -141,15 +142,19 @@ func handleAPISetLog(w http.ResponseWriter, r *http.Request) {
 			user = v
 		}
 	}
-	err = addDB(ip, port, keep, log, project, slug, tool, user)
+	err = addDB(ip, keep, log, project, slug, tool, user)
 	if err != nil {
 		fmt.Fprintln(w, err)
 	}
 }
 
-func webserver(port string) {
+func webserver() {
+	ip, err := serviceIP()
+	if err != nil {
+		log.Fatal(err)
+	}
 	http.HandleFunc("/", root)
 	http.HandleFunc("/api/setlog", handleAPISetLog)
-	fmt.Printf("Web Server Start : http://%s%s\n", LocalIP(), port)
-	http.ListenAndServe(port, nil)
+	fmt.Printf("Web Server Start : http://%s%s\n", ip, *flagHTTP)
+	http.ListenAndServe(*flagHTTP, nil)
 }
