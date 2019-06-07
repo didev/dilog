@@ -137,13 +137,13 @@ func title() string {
 						%s%s
 						%s%s
 						%s</div><br><br>`,
-		"Time", flength("Time", 26),
-		"Keep", flength("Keep", 5),
-		"IP", flength("IP", 14),
-		"User", flength("User", 19),
-		"Tool", flength("Tool", 11),
-		"Project", flength("Project", 11),
-		"Slug", flength("Slug", 15),
+		"Time", strings.Repeat("&nbsp;", 22),
+		"Keep", strings.Repeat("&nbsp;", 5),
+		"IP", strings.Repeat("&nbsp;", 13),
+		"User", strings.Repeat("&nbsp;", 15),
+		"Tool", strings.Repeat("&nbsp;", 11),
+		"Project", strings.Repeat("&nbsp;", 11),
+		"Slug", strings.Repeat("&nbsp;", 15),
 		"Log")
 }
 
@@ -184,7 +184,7 @@ func linklog(log string) string {
 
 func log2tag(log Log) string {
 	return fmt.Sprintf(`<div class="log">&nbsp;%s&nbsp;
-						%s%s&nbsp;
+						%04d&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 						%s%s&nbsp;
 						%s%s&nbsp;
 						%s%s&nbsp;
@@ -192,7 +192,7 @@ func log2tag(log Log) string {
 						%s%s&nbsp;
 						%s</div><br>`,
 		log.Time,
-		log.Keep, flength(log.Keep, 4),
+		log.Keep,
 		log.Cip, flength(log.Cip, 13),
 		log.User, flength(log.User, 18),
 		linktool(log.Tool), flength(log.Tool, 10),

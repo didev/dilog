@@ -14,7 +14,7 @@ func genid() string {
 	return strconv.Itoa(int(time.Now().UnixNano() / int64(time.Millisecond)))
 }
 
-func addDB(ip, keep, logstr, project, slug, tool, user string) error {
+func addDB(ip, logstr, project, slug, tool, user string, keep int) error {
 	session, err := mgo.Dial(*flagDBIP)
 	if err != nil {
 		log.Println("DB Connect Err : ", err)

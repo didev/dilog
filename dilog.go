@@ -20,12 +20,14 @@ var (
 	flagProject = flag.String("project", "", "project name")
 	flagSlug    = flag.String("slug", "", "shot or asset name")
 	flagLog     = flag.String("log", "", "log strings")
-	flagKeep    = flag.String("keep", "180", "Days to keep")
+	flagKeep    = flag.Int("keep", 180, "Days to keep")
 	flagUser    = flag.String("user", "", "custom Username.")
 	// find mode
 	flagFind = flag.String("find", "", "search word")
 	// remove mode
 	flagRm = flag.Bool("rm", false, "Delete data older than keep days")
+	// flag help
+	flagHelp = flag.Bool("help", false, "print help")
 )
 
 func username() string {
@@ -45,19 +47,16 @@ func username() string {
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	flag.Parse()
-
-	if *flagTool != "" && *flagLog != "" && *flagHTTP == "" {
+	// add mode
+	if *flagTool != "" && *flagLog != "" {
 		if *flagUser == "" {
 			*flagUser = username()
 		}
-
-		// MPAA를 대비하기 위해선, 로그기록시 IP, Port가 DB에 저장되는 것이 좋다.
-		// Port는 restAPI 퀘스트 헤더에 존재하는데, 현재 많은 툴에서 사용중인 dilog의 cmd모드는 제거하고 restAPI만 남기면 좋다.
 		ip, err := serviceIP()
 		if err != nil {
 			log.Fatal(err)
 		}
-		err = addDB(ip, *flagKeep, *flagLog, *flagProject, *flagSlug, *flagTool, *flagUser)
+		err = addDB(ip, *flagLog, *flagProject, *flagSlug, *flagTool, *flagUser, *flagKeep)
 		if err != nil {
 			log.Fatal("DB장애로 로그를 추가할 수 없습니다.")
 		}
@@ -79,7 +78,7 @@ func main() {
 			log.Fatal("DB장애로 처리할 수 없습니다.")
 		}
 		for _, i := range items {
-			fmt.Printf("%-25s %-4s %-15s %-20s %-10s %-10s %-14s %s\n", i.Time, i.Keep, i.Cip, i.User, i.Tool, i.Project, i.Slug, i.Log)
+			fmt.Printf("%-25s %-4d %-15s %-20s %-10s %-10s %-14s %s\n", i.Time, i.Keep, i.Cip, i.User, i.Tool, i.Project, i.Slug, i.Log)
 		}
 	} else if *flagRm {
 		//remove mode
@@ -103,6 +102,8 @@ func main() {
 	} else if regexpPort.MatchString(*flagHTTP) {
 		webserver()
 	}
-	fmt.Println("Digitalidea log server")
-	flag.PrintDefaults()
+	if *flagHelp {
+		fmt.Println("Digitalidea log server")
+		flag.PrintDefaults()
+	}
 }

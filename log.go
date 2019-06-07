@@ -4,7 +4,7 @@ package main
 type Log struct {
 	Cip     string // Client IP
 	ID      string // log ID
-	Keep    string // 보관일수
+	Keep    int    // 보관일수
 	Log     string // 로그내용
 	Project string // 프로젝트
 	Slug    string // CSI같은 툴에서 사용하는 Slug

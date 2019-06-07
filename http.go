@@ -7,6 +7,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -82,7 +83,7 @@ func handleAPISetLog(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Post Only", http.StatusMethodNotAllowed)
 		return
 	}
-	var keep string
+	var keep int
 	var log string
 	var project string
 	var slug string
@@ -104,7 +105,11 @@ func handleAPISetLog(w http.ResponseWriter, r *http.Request) {
 				fmt.Fprintln(w, err)
 				return
 			}
-			keep = v
+			keep, err = strconv.Atoi(v)
+			if err != nil {
+				fmt.Fprintln(w, err)
+				return
+			}
 		case "log":
 			v, err := PostFormValueInList(key, value)
 			if err != nil {
@@ -142,7 +147,7 @@ func handleAPISetLog(w http.ResponseWriter, r *http.Request) {
 			user = v
 		}
 	}
-	err = addDB(ip, keep, log, project, slug, tool, user)
+	err = addDB(ip, log, project, slug, tool, user, keep)
 	if err != nil {
 		fmt.Fprintln(w, err)
 	}
