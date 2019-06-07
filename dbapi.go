@@ -10,10 +10,6 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-func genid() string {
-	return strconv.Itoa(int(time.Now().UnixNano() / int64(time.Millisecond)))
-}
-
 func addDB(ip, logstr, project, slug, tool, user string, keep int) error {
 	session, err := mgo.Dial(*flagDBIP)
 	if err != nil {
@@ -22,10 +18,11 @@ func addDB(ip, logstr, project, slug, tool, user string, keep int) error {
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
-	c := session.DB("dilog").C("logs")
+	c := session.DB(*flagDBName).C(*flagCollectionName)
 	now := time.Now()
+	id := strconv.Itoa(int(now.UnixNano() / int64(time.Millisecond)))
 	doc := Log{Cip: ip,
-		ID:      genid(),
+		ID:      id,
 		Keep:    keep,
 		Log:     logstr,
 		Project: project,
@@ -51,7 +48,7 @@ func allDB() ([]Log, error) {
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	var results []Log
-	c := session.DB("dilog").C("logs")
+	c := session.DB(*flagDBName).C(*flagCollectionName)
 	err = c.Find(bson.M{}).All(&results)
 	if err != nil {
 		log.Println("DB Find Err : ", err)
@@ -69,7 +66,7 @@ func findtDB(toolname string) ([]Log, error) {
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	var results []Log
-	c := session.DB("dilog").C("logs")
+	c := session.DB(*flagDBName).C(*flagCollectionName)
 	err = c.Find(bson.M{"tool": &bson.RegEx{Pattern: toolname, Options: "i"}}).Sort("-time").All(&results)
 	if err != nil {
 		log.Println("DB Find Err : ", err)
@@ -87,7 +84,7 @@ func findtpDB(toolname, project string) ([]Log, error) {
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	var results []Log
-	c := session.DB("dilog").C("logs")
+	c := session.DB(*flagDBName).C(*flagCollectionName)
 	err = c.Find(bson.M{"$and": []bson.M{
 		bson.M{"tool": &bson.RegEx{Pattern: toolname, Options: "i"}},
 		bson.M{"project": &bson.RegEx{Pattern: project, Options: "i"}},
@@ -99,6 +96,7 @@ func findtpDB(toolname, project string) ([]Log, error) {
 	return results, nil
 }
 
+// findtpsDB 함수는 툴이름, 프로젝트, Slug를 입력받아서 로그를 검색한다.
 func findtpsDB(toolname, project, slug string) ([]Log, error) {
 	session, err := mgo.Dial(*flagDBIP)
 	if err != nil {
@@ -108,7 +106,7 @@ func findtpsDB(toolname, project, slug string) ([]Log, error) {
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	var results []Log
-	c := session.DB("dilog").C("logs")
+	c := session.DB(*flagDBName).C(*flagCollectionName)
 	err = c.Find(bson.M{"$and": []bson.M{
 		bson.M{"tool": &bson.RegEx{Pattern: toolname, Options: "i"}},
 		bson.M{"project": &bson.RegEx{Pattern: project, Options: "i"}},
@@ -131,7 +129,7 @@ func findDB(searchword string) ([]Log, error) {
 	session.SetMode(mgo.Monotonic, true)
 	var results []Log
 	var wordlist []string
-	c := session.DB("dilog").C("logs")
+	c := session.DB(*flagDBName).C(*flagCollectionName)
 	if len(strings.Split(searchword, " ")) == 1 {
 		err = c.Find(bson.M{"$or": []bson.M{
 			bson.M{"cip": &bson.RegEx{Pattern: searchword, Options: "i"}},
@@ -224,110 +222,6 @@ func findDB(searchword string) ([]Log, error) {
 	return results, nil
 }
 
-func findnumDB(searchword string) (int, error) {
-	var wordlist []string
-	session, err := mgo.Dial(*flagDBIP)
-	if err != nil {
-		log.Println("DB Find Err : ", err)
-		return 0, err
-	}
-	defer session.Close()
-	session.SetMode(mgo.Monotonic, true)
-	c := session.DB("dilog").C("logs")
-	if len(strings.Split(searchword, " ")) == 1 {
-		num, err := c.Find(bson.M{"$or": []bson.M{
-			bson.M{"cip": &bson.RegEx{Pattern: searchword, Options: "i"}},
-			bson.M{"id": &bson.RegEx{Pattern: searchword, Options: "i"}},
-			bson.M{"log": &bson.RegEx{Pattern: searchword, Options: "i"}},
-			bson.M{"os": &bson.RegEx{Pattern: searchword, Options: "i"}},
-			bson.M{"project": &bson.RegEx{Pattern: searchword, Options: "i"}},
-			bson.M{"slug": &bson.RegEx{Pattern: searchword, Options: "i"}},
-			bson.M{"time": &bson.RegEx{Pattern: searchword, Options: "i"}},
-			bson.M{"tool": &bson.RegEx{Pattern: searchword, Options: "i"}},
-			bson.M{"user": &bson.RegEx{Pattern: searchword, Options: "i"}},
-		}}).Count()
-		if err != nil {
-			log.Println("DB Find Err : ", err)
-			return 0, err
-		}
-		return num, nil
-	} else if len(strings.Split(searchword, " ")) == 2 {
-		wordlist = strings.Split(searchword, " ")
-		num, err := c.Find(bson.M{"$and": []bson.M{
-			bson.M{"$or": []bson.M{
-				bson.M{"cip": &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
-				bson.M{"id": &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
-				bson.M{"log": &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
-				bson.M{"os": &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
-				bson.M{"project": &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
-				bson.M{"slug": &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
-				bson.M{"time": &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
-				bson.M{"tool": &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
-				bson.M{"user": &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
-			}},
-			bson.M{"$or": []bson.M{
-				bson.M{"cip": &bson.RegEx{Pattern: wordlist[1], Options: "i"}},
-				bson.M{"id": &bson.RegEx{Pattern: wordlist[1], Options: "i"}},
-				bson.M{"log": &bson.RegEx{Pattern: wordlist[1], Options: "i"}},
-				bson.M{"os": &bson.RegEx{Pattern: wordlist[1], Options: "i"}},
-				bson.M{"project": &bson.RegEx{Pattern: wordlist[1], Options: "i"}},
-				bson.M{"slug": &bson.RegEx{Pattern: wordlist[1], Options: "i"}},
-				bson.M{"time": &bson.RegEx{Pattern: wordlist[1], Options: "i"}},
-				bson.M{"tool": &bson.RegEx{Pattern: wordlist[1], Options: "i"}},
-				bson.M{"user": &bson.RegEx{Pattern: wordlist[1], Options: "i"}},
-			}},
-		},
-		}).Count()
-		if err != nil {
-			log.Println("DB Find Err : ", err)
-			return 0, err
-		}
-		return num, nil
-	} else {
-		wordlist = strings.Split(searchword, " ")
-		num, err := c.Find(bson.M{"$and": []bson.M{
-			bson.M{"$or": []bson.M{
-				bson.M{"cip": &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
-				bson.M{"id": &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
-				bson.M{"log": &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
-				bson.M{"os": &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
-				bson.M{"project": &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
-				bson.M{"slug": &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
-				bson.M{"time": &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
-				bson.M{"tool": &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
-				bson.M{"user": &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
-			}},
-			bson.M{"$or": []bson.M{
-				bson.M{"cip": &bson.RegEx{Pattern: wordlist[1], Options: "i"}},
-				bson.M{"id": &bson.RegEx{Pattern: wordlist[1], Options: "i"}},
-				bson.M{"log": &bson.RegEx{Pattern: wordlist[1], Options: "i"}},
-				bson.M{"os": &bson.RegEx{Pattern: wordlist[1], Options: "i"}},
-				bson.M{"project": &bson.RegEx{Pattern: wordlist[1], Options: "i"}},
-				bson.M{"slug": &bson.RegEx{Pattern: wordlist[1], Options: "i"}},
-				bson.M{"time": &bson.RegEx{Pattern: wordlist[1], Options: "i"}},
-				bson.M{"tool": &bson.RegEx{Pattern: wordlist[1], Options: "i"}},
-				bson.M{"user": &bson.RegEx{Pattern: wordlist[1], Options: "i"}},
-			}},
-			bson.M{"$or": []bson.M{
-				bson.M{"cip": &bson.RegEx{Pattern: wordlist[2], Options: "i"}},
-				bson.M{"id": &bson.RegEx{Pattern: wordlist[2], Options: "i"}},
-				bson.M{"log": &bson.RegEx{Pattern: wordlist[2], Options: "i"}},
-				bson.M{"os": &bson.RegEx{Pattern: wordlist[2], Options: "i"}},
-				bson.M{"project": &bson.RegEx{Pattern: wordlist[2], Options: "i"}},
-				bson.M{"slug": &bson.RegEx{Pattern: wordlist[2], Options: "i"}},
-				bson.M{"time": &bson.RegEx{Pattern: wordlist[2], Options: "i"}},
-				bson.M{"tool": &bson.RegEx{Pattern: wordlist[2], Options: "i"}},
-				bson.M{"user": &bson.RegEx{Pattern: wordlist[2], Options: "i"}},
-			}},
-		}}).Count()
-		if err != nil {
-			log.Println("DB Find Err : ", err)
-			return 0, err
-		}
-		return num, nil
-	}
-}
-
 func rmDB(id string) (bool, error) {
 	session, err := mgo.Dial(*flagDBIP)
 	if err != nil {
@@ -336,7 +230,7 @@ func rmDB(id string) (bool, error) {
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
-	err = session.DB("dilog").C("logs").Remove(bson.M{"id": id})
+	err = session.DB(*flagDBName).C(*flagCollectionName).Remove(bson.M{"id": id})
 	if err != nil {
 		log.Println("DB Remove Err : ", err)
 		return false, err

@@ -1,0 +1,14 @@
+{{define "info"}}
+<div class="info">
+    Info:
+    {{if .Tool}}
+        {{.Tool}}
+        {{if .Project}}
+            > {{.Project}}
+            {{if .Slug}}
+            > {{.Slug}}
+            {{end}}
+        {{end}}
+    {{end}}
+</div><br>
+{{end}}

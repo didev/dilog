@@ -9,12 +9,17 @@ import (
 	"regexp"
 	"runtime"
 	"strings"
+	"text/template"
 )
 
 var (
-	regexpPort = regexp.MustCompile(`:\d{2,5}$`)
-	flagHTTP   = flag.String("http", "", "dilog service port ex):8080")
-	flagDBIP   = flag.String("dbip", "127.0.0.1", "mongodb ip")
+	// server setting
+	regexpPort         = regexp.MustCompile(`:\d{2,5}$`)
+	flagHTTP           = flag.String("http", "", "dilog service port ex):8080")
+	flagDBIP           = flag.String("dbip", "127.0.0.1", "mongodb ip")
+	flagDBName         = flag.String("dbname", "dilog", "mongodb database name")
+	flagCollectionName = flag.String("collection", "logs", "mongodb database name")
+	templates          = template.New("main")
 	// add mode
 	flagTool    = flag.String("tool", "", "tool name")
 	flagProject = flag.String("project", "", "project name")
@@ -49,7 +54,8 @@ func main() {
 	flag.Parse()
 	// webserver
 	if regexpPort.MatchString(*flagHTTP) {
-		webserver()
+		templates = template.Must(template.New("main").ParseGlob("assets/template/*"))
+		Webserver()
 	}
 	//find mode
 	if *flagFind != "" {

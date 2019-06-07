@@ -1,0 +1,25 @@
+{{define "logs"}}
+<br>
+    <center><div class="noresult">No Result.</div></center>
+<br>
+
+<div class="title">Time Keep IP User Tool Project Slug Logs</div>
+
+{{range .Logs}}
+<div class="log">
+    {{.Time}}
+    {{.Keep}}
+    {{.Cip}}
+    {{.User}}
+    <a href="/log/{{.Tool}}">{{.Tool}}</a>
+    <a href="/log/{{.Tool}}/{{.Project}}">{{.Project}}</a>
+    <a href="/log/{{.Tool}}/{{.Project}}/{{.Slug}}">{{.Slug}}</a>
+    {{.Log}}
+</div><br>
+
+
+
+{{end}}
+
+
+{{end}}

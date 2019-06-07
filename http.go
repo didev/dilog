@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"io"
 	"log"
 	"net"
 	"net/http"
@@ -13,57 +12,64 @@ import (
 
 func root(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
-	var searchword string
-	var tool string
-	var project string
-	var slug string
-	var urllist []string
-	searchword = r.FormValue("searchword")
-	urllist = strings.Split(r.URL.Path, "/")
+	type recipe struct {
+		Searchword string
+		Tool       string
+		Project    string
+		Slug       string
+		Urllist    []string
+		Logs       []Log
+	}
+	rcp := recipe{}
+	rcp.Searchword = r.FormValue("searchword")
+	rcp.Urllist = strings.Split(r.URL.Path, "/")
 
-	if len(urllist) == 5 {
-		slug = urllist[4]
-		project = urllist[3]
-		tool = urllist[2]
-		logs, err := findtpsDB(tool, project, slug)
+	if len(rcp.Urllist) == 5 {
+		rcp.Slug = rcp.Urllist[4]
+		rcp.Project = rcp.Urllist[3]
+		rcp.Tool = rcp.Urllist[2]
+		logs, err := findtpsDB(rcp.Tool, rcp.Project, rcp.Slug)
 		if err != nil {
-			io.WriteString(w, headHTML+"<br><center>DB 또는 네트워크 장애로 로그를 가지고 올 수 없습니다.</center>")
+			templates.ExecuteTemplate(w, "dberr", nil)
 			return
 		}
-		io.WriteString(w, headHTML+infoHTML(tool, project, slug)+searchboxHTML(searchword)+logHTML(logs))
+		rcp.Logs = logs
+		templates.ExecuteTemplate(w, "result", rcp)
 		return
-	} else if len(urllist) == 4 {
-		project = urllist[3]
-		tool = urllist[2]
-		logs, err := findtpDB(tool, project)
+	} else if len(rcp.Urllist) == 4 {
+		rcp.Project = rcp.Urllist[3]
+		rcp.Tool = rcp.Urllist[2]
+		logs, err := findtpDB(rcp.Tool, rcp.Project)
 		if err != nil {
-			io.WriteString(w, headHTML+"<br><center>DB 또는 네트워크 장애로 로그를 가지고 올 수 없습니다.</center>")
+			templates.ExecuteTemplate(w, "dberr", nil)
 			return
 		}
-		io.WriteString(w, headHTML+infoHTML(tool, project, "")+searchboxHTML(searchword)+logHTML(logs))
+		rcp.Logs = logs
+		templates.ExecuteTemplate(w, "result", rcp)
 		return
-	} else if len(urllist) == 3 {
-		tool = urllist[2]
-		logs, err := findtDB(tool)
+	} else if len(rcp.Urllist) == 3 {
+		rcp.Tool = rcp.Urllist[2]
+		logs, err := findtDB(rcp.Tool)
 		if err != nil {
-			io.WriteString(w, headHTML+"<br><center>DB 또는 네트워크 장애로 로그를 가지고 올 수 없습니다.</center>")
+			templates.ExecuteTemplate(w, "dberr", nil)
 			return
 		}
-		io.WriteString(w, headHTML+infoHTML(tool, "", "")+searchboxHTML(searchword)+logHTML(logs))
+		rcp.Logs = logs
+		templates.ExecuteTemplate(w, "result", rcp)
 		return
 	} else {
-		if searchword != "" {
-			logs, err := findDB(searchword)
+		if rcp.Searchword != "" {
+			logs, err := findDB(rcp.Searchword)
 			if err != nil {
-				io.WriteString(w, headHTML+"<br><center>DB 또는 네트워크 장애로 로그를 가지고 올 수 없습니다.</center>")
+				templates.ExecuteTemplate(w, "dberr", nil)
 				return
 			}
-			io.WriteString(w, headHTML+infoHTML("", "", "")+searchboxHTML(searchword)+logHTML(logs))
+			rcp.Logs = logs
+			templates.ExecuteTemplate(w, "result", rcp)
 			return
 		}
 	}
-	var logs []Log
-	io.WriteString(w, headHTML+infoHTML("", "", "")+searchboxHTML(searchword)+logHTML(logs))
+	templates.ExecuteTemplate(w, "result", rcp)
 }
 
 // PostFormValueInList 는 PostForm 쿼리시 Value값이 1개라면 값을 리턴한다.
@@ -153,13 +159,19 @@ func handleAPISetLog(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func webserver() {
+// Webserver 함수는 웹서버를 실행합니다.
+func Webserver() {
 	ip, err := serviceIP()
 	if err != nil {
 		log.Fatal(err)
 	}
+	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("assets/css"))))
+	http.Handle("/img/", http.StripPrefix("/img/", http.FileServer(http.Dir("assets/img"))))
 	http.HandleFunc("/", root)
 	http.HandleFunc("/api/setlog", handleAPISetLog)
 	fmt.Printf("Web Server Start : http://%s%s\n", ip, *flagHTTP)
-	http.ListenAndServe(*flagHTTP, nil)
+	err = http.ListenAndServe(*flagHTTP, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
