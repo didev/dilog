@@ -34,7 +34,7 @@ div {
 
 .button {
     width:100px;
-    padding: 7px;
+    padding: 8px;
     margin: 20px auto;
     text-align:center;
     color:#FFFFFF;
@@ -58,12 +58,13 @@ div {
 }
 
 .title {
-    margin-left: 10px;
+    margin-left: 20px;
     margin-right: 10px;
     font-size: 16px;
     color: #B6C751;
     font-weight : bold;
     font-family: Courier, 'Courier New', Courier_New;
+    text-align: left;
 }
 
 .log {
@@ -72,7 +73,6 @@ div {
     font-size: 16px;
     color: #FFFFFF;
     font-family: Courier, 'Courier New', Courier_New;
-    display:table-cell;
     font-weight: bold;
     white-space: nowrap;
 }
@@ -81,4 +81,9 @@ div {
     font-size: 14px;
     color: #FF0000;
     font-weight : bold;
+}
+
+.logTable {
+    width: 80%;
+    border-spacing: 15px;
 }

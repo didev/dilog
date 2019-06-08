@@ -1,24 +1,35 @@
 {{define "logs"}}
-<br>
-    <center><div class="noresult">No Result.</div></center>
-<br>
 
-<div class="title">Time Keep IP User Tool Project Slug Logs</div>
-
-{{range .Logs}}
-<div class="log">
-    {{.Time}}
-    {{.Keep}}
-    {{.Cip}}
-    {{.User}}
-    <a href="/log/{{.Tool}}">{{.Tool}}</a>
-    <a href="/log/{{.Tool}}/{{.Project}}">{{.Project}}</a>
-    <a href="/log/{{.Tool}}/{{.Project}}/{{.Slug}}">{{.Slug}}</a>
-    {{.Log}}
-</div><br>
-
-
-
+{{if .Logs}}
+<center>
+    <table class="logTable">
+        <tr class="title">
+            <th>Time</th>
+            <th>Keep</th>
+            <th>IP</th>
+            <th>User</th>
+            <th>Tool</th>
+            <th>Project</th>
+            <th>Slug</th>
+            <th>Logs</th>
+        </tr>
+    
+        {{range .Logs}}
+            <tr class="log">
+                <td width=10%>{{.Time}}</td>
+                <td width=5%>{{.Keep}}</td>
+                <td width=10%>{{.Cip}}</td>
+                <td width=5%>{{.User}}</td>
+                <td width=5%><a href="/log/{{.Tool}}">{{.Tool}}</a></td>
+                <td width=10%><a href="/log/{{.Tool}}/{{.Project}}">{{.Project}}</a></td>
+                <td width=10%><a href="/log/{{.Tool}}/{{.Project}}/{{.Slug}}">{{.Slug}}</a></td>
+                <td width=45%>{{.Log}}</td>
+            </tr>
+        {{end}}
+    </table>
+</center>
+{{else}}
+    <br><center><div class="noresult">No Result.</div></center><br>
 {{end}}
 
 
