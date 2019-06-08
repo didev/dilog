@@ -119,7 +119,7 @@ func findtpsDB(toolname, project, slug string) ([]Log, error) {
 	return results, nil
 }
 
-func findDB(searchword string) ([]Log, error) {
+func findDB(words string) ([]Log, error) {
 	session, err := mgo.Dial(*flagDBIP)
 	if err != nil {
 		log.Println("DB Connect Err : ", err)
@@ -128,96 +128,25 @@ func findDB(searchword string) ([]Log, error) {
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	var results []Log
-	var wordlist []string
 	c := session.DB(*flagDBName).C(*flagCollectionName)
-	if len(strings.Split(searchword, " ")) == 1 {
-		err = c.Find(bson.M{"$or": []bson.M{
-			bson.M{"cip": &bson.RegEx{Pattern: searchword, Options: "i"}},
-			bson.M{"id": &bson.RegEx{Pattern: searchword, Options: "i"}},
-			bson.M{"log": &bson.RegEx{Pattern: searchword, Options: "i"}},
-			bson.M{"os": &bson.RegEx{Pattern: searchword, Options: "i"}},
-			bson.M{"project": &bson.RegEx{Pattern: searchword, Options: "i"}},
-			bson.M{"slug": &bson.RegEx{Pattern: searchword, Options: "i"}},
-			bson.M{"time": &bson.RegEx{Pattern: searchword, Options: "i"}},
-			bson.M{"tool": &bson.RegEx{Pattern: searchword, Options: "i"}},
-			bson.M{"user": &bson.RegEx{Pattern: searchword, Options: "i"}},
-		}}).Sort("-time").All(&results)
-		if err != nil {
-			log.Println("DB Find Err : ", err)
-			return nil, err
-		}
-	} else if len(strings.Split(searchword, " ")) == 2 {
-		wordlist = strings.Split(searchword, " ")
-		err = c.Find(bson.M{"$and": []bson.M{
-			bson.M{"$or": []bson.M{
-				bson.M{"cip": &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
-				bson.M{"id": &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
-				bson.M{"log": &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
-				bson.M{"os": &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
-				bson.M{"project": &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
-				bson.M{"slug": &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
-				bson.M{"time": &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
-				bson.M{"tool": &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
-				bson.M{"user": &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
-			}},
-			bson.M{"$or": []bson.M{
-				bson.M{"cip": &bson.RegEx{Pattern: wordlist[1], Options: "i"}},
-				bson.M{"id": &bson.RegEx{Pattern: wordlist[1], Options: "i"}},
-				bson.M{"log": &bson.RegEx{Pattern: wordlist[1], Options: "i"}},
-				bson.M{"os": &bson.RegEx{Pattern: wordlist[1], Options: "i"}},
-				bson.M{"project": &bson.RegEx{Pattern: wordlist[1], Options: "i"}},
-				bson.M{"slug": &bson.RegEx{Pattern: wordlist[1], Options: "i"}},
-				bson.M{"time": &bson.RegEx{Pattern: wordlist[1], Options: "i"}},
-				bson.M{"tool": &bson.RegEx{Pattern: wordlist[1], Options: "i"}},
-				bson.M{"user": &bson.RegEx{Pattern: wordlist[1], Options: "i"}},
-			}},
-		},
-		}).Sort("-time").All(&results)
-		if err != nil {
-			log.Println("DB Find Err : ", err)
-			return nil, err
-		}
-	} else {
-		wordlist = strings.Split(searchword, " ")
-		err = c.Find(bson.M{"$and": []bson.M{
-			bson.M{"$or": []bson.M{
-				bson.M{"cip": &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
-				bson.M{"id": &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
-				bson.M{"log": &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
-				bson.M{"os": &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
-				bson.M{"project": &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
-				bson.M{"slug": &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
-				bson.M{"time": &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
-				bson.M{"tool": &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
-				bson.M{"user": &bson.RegEx{Pattern: wordlist[0], Options: "i"}},
-			}},
-			bson.M{"$or": []bson.M{
-				bson.M{"cip": &bson.RegEx{Pattern: wordlist[1], Options: "i"}},
-				bson.M{"id": &bson.RegEx{Pattern: wordlist[1], Options: "i"}},
-				bson.M{"log": &bson.RegEx{Pattern: wordlist[1], Options: "i"}},
-				bson.M{"os": &bson.RegEx{Pattern: wordlist[1], Options: "i"}},
-				bson.M{"project": &bson.RegEx{Pattern: wordlist[1], Options: "i"}},
-				bson.M{"slug": &bson.RegEx{Pattern: wordlist[1], Options: "i"}},
-				bson.M{"time": &bson.RegEx{Pattern: wordlist[1], Options: "i"}},
-				bson.M{"tool": &bson.RegEx{Pattern: wordlist[1], Options: "i"}},
-				bson.M{"user": &bson.RegEx{Pattern: wordlist[1], Options: "i"}},
-			}},
-			bson.M{"$or": []bson.M{
-				bson.M{"cip": &bson.RegEx{Pattern: wordlist[2], Options: "i"}},
-				bson.M{"id": &bson.RegEx{Pattern: wordlist[2], Options: "i"}},
-				bson.M{"log": &bson.RegEx{Pattern: wordlist[2], Options: "i"}},
-				bson.M{"os": &bson.RegEx{Pattern: wordlist[2], Options: "i"}},
-				bson.M{"project": &bson.RegEx{Pattern: wordlist[2], Options: "i"}},
-				bson.M{"slug": &bson.RegEx{Pattern: wordlist[2], Options: "i"}},
-				bson.M{"time": &bson.RegEx{Pattern: wordlist[2], Options: "i"}},
-				bson.M{"tool": &bson.RegEx{Pattern: wordlist[2], Options: "i"}},
-				bson.M{"user": &bson.RegEx{Pattern: wordlist[2], Options: "i"}},
-			}},
-		}}).Sort("-time").All(&results)
-		if err != nil {
-			log.Println("DB Find Err : ", err)
-			return nil, err
-		}
+	wordQueries := []bson.M{}
+	for _, word := range strings.Split(words, " ") {
+		wordQueries = append(wordQueries, bson.M{"$or": []bson.M{
+			bson.M{"cip": &bson.RegEx{Pattern: word, Options: "i"}},
+			bson.M{"id": &bson.RegEx{Pattern: word, Options: "i"}},
+			bson.M{"log": &bson.RegEx{Pattern: word, Options: "i"}},
+			bson.M{"os": &bson.RegEx{Pattern: word, Options: "i"}},
+			bson.M{"project": &bson.RegEx{Pattern: word, Options: "i"}},
+			bson.M{"slug": &bson.RegEx{Pattern: word, Options: "i"}},
+			bson.M{"time": &bson.RegEx{Pattern: word, Options: "i"}},
+			bson.M{"tool": &bson.RegEx{Pattern: word, Options: "i"}},
+			bson.M{"user": &bson.RegEx{Pattern: word, Options: "i"}},
+		}})
+	}
+	err = c.Find(bson.M{"$and": wordQueries}).Sort("-time").All(&results)
+	if err != nil {
+		log.Println("DB Find Err : ", err)
+		return nil, err
 	}
 	return results, nil
 }
