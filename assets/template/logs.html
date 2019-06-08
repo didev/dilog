@@ -1,36 +1,35 @@
 {{define "logs"}}
-
+<div class="p-5">
 {{if .Logs}}
-<center>
-    <table class="logTable">
-        <tr class="title">
-            <th>Time</th>
-            <th>Keep</th>
-            <th>IP</th>
-            <th>User</th>
-            <th>Tool</th>
-            <th>Project</th>
-            <th>Slug</th>
-            <th>Logs</th>
-        </tr>
-    
+        <div class="row text-warning mb-3">
+            <div class="col-lg-2">Time</div>
+            <div class="col-lg-1">Keep</div>
+            <div class="col-lg-1">IP</div>
+            <div class="col-lg-1">User</div>
+            <div class="col-lg-1">Tool</div>
+            <div class="col-lg-1">Project</div>
+            <div class="col-lg-1">Slug</div>
+            <div class="col-lg-4">Logs</div>
+        </div>
         {{range .Logs}}
-            <tr class="log">
-                <td width=10%>{{.Time}}</td>
-                <td width=5%>{{.Keep}}</td>
-                <td width=10%>{{.Cip}}</td>
-                <td width=5%>{{.User}}</td>
-                <td width=5%><a href="/search?tool={{.Tool}}&page=1">{{.Tool}}</a></td>
-                <td width=10%><a href="/search?tool={{.Tool}}&project={{.Project}}&page=1">{{.Project}}</a></td>
-                <td width=10%><a href="/search?tool={{.Tool}}&project={{.Project}}&slug={{.Slug}}&page=1">{{.Slug}}</a></td>
-                <td width=45%>{{addLink .Log}}</td>
-            </tr>
-        {{end}}
-    </table>
-</center>
+        <div class="row text-secondary mb-1">
+            <div class="col-lg-2">{{.Time}}</div>
+            <div class="col-lg-1">{{.Keep}}</div>
+            <div class="col-lg-1 h6 small">{{.Cip}}</div>
+            <div class="col-lg-1">{{.User}}</div>
+            <div class="col-lg-1"><a href="/search?tool={{.Tool}}&page=1">{{.Tool}}</a></div>
+            <div class="col-lg-1"><a href="/search?tool={{.Tool}}&project={{.Project}}&page=1" class="text-success">{{.Project}}</a></div>
+            <div class="col-lg-1"><a href="/search?tool={{.Tool}}&project={{.Project}}&slug={{.Slug}}&page=1" class="text-info">{{.Slug}}</a></div>
+            <div class="col-lg-4 text-white">{{addLink .Log}}</div>
+        </div>
+    {{end}}
+    
+
 {{else}}
-    <br><center><div class="noresult">No Result.</div></center><br>
+    <div class="text-danger">
+        No Result.
+    </div>
 {{end}}
 
-
+</div>
 {{end}}

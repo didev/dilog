@@ -197,8 +197,7 @@ func Webserver() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("assets/css"))))
-	http.Handle("/img/", http.StripPrefix("/img/", http.FileServer(http.Dir("assets/img"))))
+	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
 	http.HandleFunc("/search", search)
 	http.HandleFunc("/", index)
 	http.HandleFunc("/api/setlog", handleAPISetLog)
