@@ -10,7 +10,21 @@ import (
 	"strings"
 )
 
-func root(w http.ResponseWriter, r *http.Request) {
+func index(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html")
+	type recipe struct {
+		Searchword string
+		Tool       string
+		Project    string
+		Slug       string
+		Urllist    []string
+		Logs       []Log
+	}
+	rcp := recipe{}
+	templates.ExecuteTemplate(w, "index", rcp)
+}
+
+func search(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 	type recipe struct {
 		Searchword string
@@ -167,7 +181,8 @@ func Webserver() {
 	}
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("assets/css"))))
 	http.Handle("/img/", http.StripPrefix("/img/", http.FileServer(http.Dir("assets/img"))))
-	http.HandleFunc("/", root)
+	http.HandleFunc("/search", search)
+	http.HandleFunc("/", index)
 	http.HandleFunc("/api/setlog", handleAPISetLog)
 	fmt.Printf("Web Server Start : http://%s%s\n", ip, *flagHTTP)
 	err = http.ListenAndServe(*flagHTTP, nil)

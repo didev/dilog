@@ -1,6 +1,6 @@
 {{define "searchbox"}}
 <center>
-    <form action="/" method="POST" name="checkboxs" class="editform">
+    <form action="/search" method="POST" name="checkboxs" class="editform">
 	<input class="searchform" id="search" placeholder="Search word.." type="text" maxlength="50" name="searchword" autofocus="autofocus" value="{{.Searchword}}">
 	<button class="button" id="button">Search</button><br>
     </form>
