@@ -13,12 +13,19 @@ var funcMap = template.FuncMap{
 	"num2list": num2pagelist,
 }
 
-// addLink templatefunc 는 로그에 경로가 있다면 dilink:// 를 생성시킨다.
+// addLink templatefunc 는 로그내용에 *flagProtocolPath에서 선언한 경로문자열이 포함된다면 dilink:// 링크를 생성시킨다.
 func addLink(log string) string {
 	var rstring string
-	words := strings.Split(log, " ")
-	for _, word := range words {
-		if strings.Contains(word, "/show") || strings.Contains(word, "/lustre") {
+	for _, word := range strings.Split(log, " ") {
+		isPath := false
+		for _, path := range strings.Split(*flagProtocolPath, ",") {
+			if !strings.Contains(word, path) {
+				continue
+			}
+			isPath = true
+			break
+		}
+		if isPath {
 			rstring += fmt.Sprintf(`<a href="dilink://%s">%s</a>`, word, word) + " "
 		} else {
 			rstring += word + " "
