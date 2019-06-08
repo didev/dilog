@@ -8,7 +8,6 @@ import (
 	"os/user"
 	"regexp"
 	"runtime"
-	"strings"
 	"text/template"
 )
 
@@ -16,9 +15,10 @@ var (
 	// server setting
 	regexpPort         = regexp.MustCompile(`:\d{2,5}$`)
 	flagHTTP           = flag.String("http", "", "dilog service port ex):8080")
-	flagDBIP           = flag.String("dbip", "127.0.0.1", "mongodb ip")
-	flagDBName         = flag.String("dbname", "dilog", "mongodb database name")
-	flagCollectionName = flag.String("collection", "logs", "mongodb database name")
+	flagDBIP           = flag.String("dbip", "127.0.0.1", "Mongodb ip")
+	flagDBName         = flag.String("dbname", "dilog", "Mongodb database name")
+	flagCollectionName = flag.String("collection", "logs", "Mongodb database name")
+	flagPagenum        = flag.Int("pagenum", 10, "Number of items on page")
 	templates          = template.New("main")
 	// add mode
 	flagTool    = flag.String("tool", "", "tool name")
@@ -57,28 +57,7 @@ func main() {
 		templates = template.Must(template.New("main").Funcs(funcMap).ParseGlob("assets/template/*"))
 		Webserver()
 	}
-	//find mode
-	if *flagFind != "" {
-		fmt.Printf("%-25s %-04s %-15s %-20s %-10s %-10s %-14s %s\n", "Time", "Keep", "IP", "User", "Tool", "Project", "Slug", "Log")
-		fmt.Printf("%-25s %-04s %-15s %-20s %-10s %-10s %-14s %s\n",
-			strings.Repeat("-", 25),
-			strings.Repeat("-", 4),
-			strings.Repeat("-", 15),
-			strings.Repeat("-", 20),
-			strings.Repeat("-", 10),
-			strings.Repeat("-", 10),
-			strings.Repeat("-", 14),
-			strings.Repeat("-", 20),
-		)
-		items, err := findDB(*flagFind)
-		if err != nil {
-			log.Fatal("DB장애로 처리할 수 없습니다.")
-		}
-		for _, i := range items {
-			fmt.Printf("%-25s %-4d %-15s %-20s %-10s %-10s %-14s %s\n", i.Time, i.Keep, i.Cip, i.User, i.Tool, i.Project, i.Slug, i.Log)
-		}
-		return
-	}
+
 	//remove mode
 	if *flagRm {
 		itemlist, err := allDB()

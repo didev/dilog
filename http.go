@@ -26,57 +26,78 @@ func search(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 	q := r.URL.Query()
 	type recipe struct {
-		Searchword string
-		Tool       string
-		Project    string
-		Slug       string
-		Logs       []Log
+		Searchword   string
+		Tool         string
+		Project      string
+		Slug         string
+		Logs         []Log
+		Page         int
+		TotalPagenum []string
 	}
 	rcp := recipe{}
 	rcp.Searchword = q.Get("searchword")
 	rcp.Tool = q.Get("tool")
 	rcp.Project = q.Get("project")
 	rcp.Slug = q.Get("slug")
-
+	page := q.Get("page")
+	if page == "" {
+		rcp.Page = 1
+	} else {
+		pagenum, err := strconv.Atoi(page)
+		if err != nil {
+			log.Println(err)
+			templates.ExecuteTemplate(w, "dberr", nil)
+			return
+		}
+		rcp.Page = pagenum
+	}
 	rcp.Searchword = r.FormValue("searchword")
 
 	if rcp.Tool != "" && rcp.Project != "" && rcp.Slug != "" {
-		logs, err := findtpsDB(rcp.Tool, rcp.Project, rcp.Slug)
+		logs, totalPagenum, err := findtpsDB(rcp.Tool, rcp.Project, rcp.Slug, rcp.Page)
 		if err != nil {
+			log.Println("findtpsDB")
 			templates.ExecuteTemplate(w, "dberr", nil)
 			return
 		}
 		rcp.Logs = logs
+		rcp.TotalPagenum = num2pagelist(totalPagenum)
 		templates.ExecuteTemplate(w, "result", rcp)
 		return
 	}
 	if rcp.Tool != "" && rcp.Project != "" {
-		logs, err := findtpDB(rcp.Tool, rcp.Project)
+		logs, totalPagenum, err := findtpDB(rcp.Tool, rcp.Project, rcp.Page)
 		if err != nil {
+			log.Println("findtpDB")
 			templates.ExecuteTemplate(w, "dberr", nil)
 			return
 		}
 		rcp.Logs = logs
+		rcp.TotalPagenum = num2pagelist(totalPagenum)
 		templates.ExecuteTemplate(w, "result", rcp)
 		return
 	}
 	if rcp.Tool != "" {
-		logs, err := findtDB(rcp.Tool)
+		logs, totalPagenum, err := findtDB(rcp.Tool, rcp.Page)
 		if err != nil {
+			log.Println("findtDB")
 			templates.ExecuteTemplate(w, "dberr", nil)
 			return
 		}
 		rcp.Logs = logs
+		rcp.TotalPagenum = num2pagelist(totalPagenum)
 		templates.ExecuteTemplate(w, "result", rcp)
 		return
 	}
 	if rcp.Searchword != "" {
-		logs, err := findDB(rcp.Searchword)
+		logs, totalPagenum, err := findDB(rcp.Searchword, rcp.Page)
 		if err != nil {
+			log.Println("findDB")
 			templates.ExecuteTemplate(w, "dberr", nil)
 			return
 		}
 		rcp.Logs = logs
+		rcp.TotalPagenum = num2pagelist(totalPagenum)
 		templates.ExecuteTemplate(w, "result", rcp)
 		return
 	}
@@ -186,4 +207,13 @@ func Webserver() {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+// TotalPage 함수는 아이템의 갯수를 이용해서 총 페이지수를 반환한다.
+func TotalPage(itemNum int) int {
+	page := itemNum / *flagPagenum
+	if itemNum%*flagPagenum != 0 {
+		page++
+	}
+	return page
 }

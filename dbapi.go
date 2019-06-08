@@ -57,73 +57,91 @@ func allDB() ([]Log, error) {
 	return results, nil
 }
 
-func findtDB(toolname string) ([]Log, error) {
+func findtDB(toolname string, page int) ([]Log, int, error) {
 	session, err := mgo.Dial(*flagDBIP)
 	if err != nil {
 		log.Println("DB Connect Err : ", err)
-		return nil, err
+		return nil, 0, err
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	var results []Log
 	c := session.DB(*flagDBName).C(*flagCollectionName)
-	err = c.Find(bson.M{"tool": &bson.RegEx{Pattern: toolname, Options: "i"}}).Sort("-time").All(&results)
+	query := bson.M{"tool": &bson.RegEx{Pattern: toolname, Options: "i"}}
+	err = c.Find(query).Sort("-time").Skip((page - 1) * *flagPagenum).Limit(*flagPagenum).All(&results)
 	if err != nil {
 		log.Println("DB Find Err : ", err)
-		return nil, err
+		return nil, 0, err
 	}
-	return results, nil
+	itemNum, err := c.Find(query).Count()
+	if err != nil {
+		log.Println("DB Find Err : ", err)
+		return nil, 0, err
+	}
+	return results, TotalPage(itemNum), nil
 }
 
-func findtpDB(toolname, project string) ([]Log, error) {
+func findtpDB(toolname, project string, page int) ([]Log, int, error) {
 	session, err := mgo.Dial(*flagDBIP)
 	if err != nil {
 		log.Println("DB Connect Err : ", err)
-		return nil, err
+		return nil, 0, err
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	var results []Log
 	c := session.DB(*flagDBName).C(*flagCollectionName)
-	err = c.Find(bson.M{"$and": []bson.M{
+	query := bson.M{"$and": []bson.M{
 		bson.M{"tool": &bson.RegEx{Pattern: toolname, Options: "i"}},
 		bson.M{"project": &bson.RegEx{Pattern: project, Options: "i"}},
-	}}).Sort("-time").All(&results)
+	}}
+	err = c.Find(query).Sort("-time").Skip(page - 1).Limit(*flagPagenum).All(&results)
 	if err != nil {
 		log.Println("DB Find Err : ", err)
-		return nil, err
+		return nil, 0, err
 	}
-	return results, nil
+	itemNum, err := c.Find(query).Count()
+	if err != nil {
+		log.Println("DB Find Err : ", err)
+		return nil, 0, err
+	}
+	return results, TotalPage(itemNum), nil
 }
 
 // findtpsDB 함수는 툴이름, 프로젝트, Slug를 입력받아서 로그를 검색한다.
-func findtpsDB(toolname, project, slug string) ([]Log, error) {
+func findtpsDB(toolname, project, slug string, page int) ([]Log, int, error) {
 	session, err := mgo.Dial(*flagDBIP)
 	if err != nil {
 		log.Println("DB Connect Err : ", err)
-		return nil, err
+		return nil, 0, err
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	var results []Log
 	c := session.DB(*flagDBName).C(*flagCollectionName)
-	err = c.Find(bson.M{"$and": []bson.M{
+	query := bson.M{"$and": []bson.M{
 		bson.M{"tool": &bson.RegEx{Pattern: toolname, Options: "i"}},
 		bson.M{"project": &bson.RegEx{Pattern: project, Options: "i"}},
 		bson.M{"slug": &bson.RegEx{Pattern: slug, Options: "i"}},
-	}}).Sort("-time").All(&results)
+	}}
+	err = c.Find(query).Sort("-time").Skip((page - 1) * *flagPagenum).Limit(*flagPagenum).All(&results)
 	if err != nil {
 		log.Println("DB Find Err : ", err)
-		return nil, err
+		return nil, 0, err
 	}
-	return results, nil
+	itemNum, err := c.Find(query).Count()
+	if err != nil {
+		log.Println("DB Find Err : ", err)
+		return nil, 0, err
+	}
+	return results, TotalPage(itemNum), nil
 }
 
-func findDB(words string) ([]Log, error) {
+func findDB(words string, page int) ([]Log, int, error) {
 	session, err := mgo.Dial(*flagDBIP)
 	if err != nil {
 		log.Println("DB Connect Err : ", err)
-		return nil, err
+		return nil, 0, err
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
@@ -143,12 +161,17 @@ func findDB(words string) ([]Log, error) {
 			bson.M{"user": &bson.RegEx{Pattern: word, Options: "i"}},
 		}})
 	}
-	err = c.Find(bson.M{"$and": wordQueries}).Sort("-time").All(&results)
+	err = c.Find(bson.M{"$and": wordQueries}).Sort("-time").Skip((page - 1) * *flagPagenum).Limit(*flagPagenum).All(&results)
 	if err != nil {
 		log.Println("DB Find Err : ", err)
-		return nil, err
+		return nil, 0, err
 	}
-	return results, nil
+	itemNum, err := c.Find(bson.M{"$and": wordQueries}).Count()
+	if err != nil {
+		log.Println("DB Find Err : ", err)
+		return nil, 0, err
+	}
+	return results, TotalPage(itemNum), nil
 }
 
 func rmDB(id string) (bool, error) {
