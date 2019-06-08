@@ -7,7 +7,6 @@ import (
 	"net"
 	"net/http"
 	"strconv"
-	"strings"
 )
 
 func index(w http.ResponseWriter, r *http.Request) {
@@ -17,7 +16,6 @@ func index(w http.ResponseWriter, r *http.Request) {
 		Tool       string
 		Project    string
 		Slug       string
-		Urllist    []string
 		Logs       []Log
 	}
 	rcp := recipe{}
@@ -26,22 +24,23 @@ func index(w http.ResponseWriter, r *http.Request) {
 
 func search(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
+	q := r.URL.Query()
 	type recipe struct {
 		Searchword string
 		Tool       string
 		Project    string
 		Slug       string
-		Urllist    []string
 		Logs       []Log
 	}
 	rcp := recipe{}
-	rcp.Searchword = r.FormValue("searchword")
-	rcp.Urllist = strings.Split(r.URL.Path, "/")
+	rcp.Searchword = q.Get("searchword")
+	rcp.Tool = q.Get("tool")
+	rcp.Project = q.Get("project")
+	rcp.Slug = q.Get("slug")
 
-	if len(rcp.Urllist) == 5 {
-		rcp.Slug = rcp.Urllist[4]
-		rcp.Project = rcp.Urllist[3]
-		rcp.Tool = rcp.Urllist[2]
+	rcp.Searchword = r.FormValue("searchword")
+
+	if rcp.Tool != "" && rcp.Project != "" && rcp.Slug != "" {
 		logs, err := findtpsDB(rcp.Tool, rcp.Project, rcp.Slug)
 		if err != nil {
 			templates.ExecuteTemplate(w, "dberr", nil)
@@ -50,9 +49,8 @@ func search(w http.ResponseWriter, r *http.Request) {
 		rcp.Logs = logs
 		templates.ExecuteTemplate(w, "result", rcp)
 		return
-	} else if len(rcp.Urllist) == 4 {
-		rcp.Project = rcp.Urllist[3]
-		rcp.Tool = rcp.Urllist[2]
+	}
+	if rcp.Tool != "" && rcp.Project != "" {
 		logs, err := findtpDB(rcp.Tool, rcp.Project)
 		if err != nil {
 			templates.ExecuteTemplate(w, "dberr", nil)
@@ -61,8 +59,8 @@ func search(w http.ResponseWriter, r *http.Request) {
 		rcp.Logs = logs
 		templates.ExecuteTemplate(w, "result", rcp)
 		return
-	} else if len(rcp.Urllist) == 3 {
-		rcp.Tool = rcp.Urllist[2]
+	}
+	if rcp.Tool != "" {
 		logs, err := findtDB(rcp.Tool)
 		if err != nil {
 			templates.ExecuteTemplate(w, "dberr", nil)
@@ -71,17 +69,16 @@ func search(w http.ResponseWriter, r *http.Request) {
 		rcp.Logs = logs
 		templates.ExecuteTemplate(w, "result", rcp)
 		return
-	} else {
-		if rcp.Searchword != "" {
-			logs, err := findDB(rcp.Searchword)
-			if err != nil {
-				templates.ExecuteTemplate(w, "dberr", nil)
-				return
-			}
-			rcp.Logs = logs
-			templates.ExecuteTemplate(w, "result", rcp)
+	}
+	if rcp.Searchword != "" {
+		logs, err := findDB(rcp.Searchword)
+		if err != nil {
+			templates.ExecuteTemplate(w, "dberr", nil)
 			return
 		}
+		rcp.Logs = logs
+		templates.ExecuteTemplate(w, "result", rcp)
+		return
 	}
 	templates.ExecuteTemplate(w, "result", rcp)
 }

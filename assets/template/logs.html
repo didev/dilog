@@ -20,9 +20,9 @@
                 <td width=5%>{{.Keep}}</td>
                 <td width=10%>{{.Cip}}</td>
                 <td width=5%>{{.User}}</td>
-                <td width=5%><a href="/log/{{.Tool}}">{{.Tool}}</a></td>
-                <td width=10%><a href="/log/{{.Tool}}/{{.Project}}">{{.Project}}</a></td>
-                <td width=10%><a href="/log/{{.Tool}}/{{.Project}}/{{.Slug}}">{{.Slug}}</a></td>
+                <td width=5%><a href="/search?tool={{.Tool}}">{{.Tool}}</a></td>
+                <td width=10%><a href="/search?tool={{.Tool}}&project={{.Project}}">{{.Project}}</a></td>
+                <td width=10%><a href="/search?tool={{.Tool}}&project={{.Project}}&slug={{.Slug}}">{{.Slug}}</a></td>
                 <td width=45%>{{addLink .Log}}</td>
             </tr>
         {{end}}
