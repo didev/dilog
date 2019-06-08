@@ -9,6 +9,14 @@ import (
 	"strconv"
 )
 
+func num2pagelist(num int) []string {
+	var page []string
+	for i := 1; i < num+1; i++ {
+		page = append(page, strconv.Itoa(i))
+	}
+	return page
+}
+
 func index(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 	type recipe struct {
@@ -19,7 +27,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 		Logs       []Log
 	}
 	rcp := recipe{}
-	templates.ExecuteTemplate(w, "index", rcp)
+	tmpl.ExecuteTemplate(w, "index", rcp)
 }
 
 func search(w http.ResponseWriter, r *http.Request) {
@@ -46,7 +54,7 @@ func search(w http.ResponseWriter, r *http.Request) {
 		pagenum, err := strconv.Atoi(page)
 		if err != nil {
 			log.Println(err)
-			templates.ExecuteTemplate(w, "dberr", nil)
+			tmpl.ExecuteTemplate(w, "dberr", nil)
 			return
 		}
 		rcp.Page = pagenum
@@ -57,51 +65,51 @@ func search(w http.ResponseWriter, r *http.Request) {
 		logs, totalPagenum, err := findtpsDB(rcp.Tool, rcp.Project, rcp.Slug, rcp.Page)
 		if err != nil {
 			log.Println("findtpsDB")
-			templates.ExecuteTemplate(w, "dberr", nil)
+			tmpl.ExecuteTemplate(w, "dberr", nil)
 			return
 		}
 		rcp.Logs = logs
 		rcp.TotalPagenum = num2pagelist(totalPagenum)
-		templates.ExecuteTemplate(w, "result", rcp)
+		tmpl.ExecuteTemplate(w, "result", rcp)
 		return
 	}
 	if rcp.Tool != "" && rcp.Project != "" {
 		logs, totalPagenum, err := findtpDB(rcp.Tool, rcp.Project, rcp.Page)
 		if err != nil {
 			log.Println("findtpDB")
-			templates.ExecuteTemplate(w, "dberr", nil)
+			tmpl.ExecuteTemplate(w, "dberr", nil)
 			return
 		}
 		rcp.Logs = logs
 		rcp.TotalPagenum = num2pagelist(totalPagenum)
-		templates.ExecuteTemplate(w, "result", rcp)
+		tmpl.ExecuteTemplate(w, "result", rcp)
 		return
 	}
 	if rcp.Tool != "" {
 		logs, totalPagenum, err := findtDB(rcp.Tool, rcp.Page)
 		if err != nil {
 			log.Println("findtDB")
-			templates.ExecuteTemplate(w, "dberr", nil)
+			tmpl.ExecuteTemplate(w, "dberr", nil)
 			return
 		}
 		rcp.Logs = logs
 		rcp.TotalPagenum = num2pagelist(totalPagenum)
-		templates.ExecuteTemplate(w, "result", rcp)
+		tmpl.ExecuteTemplate(w, "result", rcp)
 		return
 	}
 	if rcp.Searchword != "" {
 		logs, totalPagenum, err := findDB(rcp.Searchword, rcp.Page)
 		if err != nil {
 			log.Println("findDB")
-			templates.ExecuteTemplate(w, "dberr", nil)
+			tmpl.ExecuteTemplate(w, "dberr", nil)
 			return
 		}
 		rcp.Logs = logs
 		rcp.TotalPagenum = num2pagelist(totalPagenum)
-		templates.ExecuteTemplate(w, "result", rcp)
+		tmpl.ExecuteTemplate(w, "result", rcp)
 		return
 	}
-	templates.ExecuteTemplate(w, "result", rcp)
+	tmpl.ExecuteTemplate(w, "result", rcp)
 }
 
 // PostFormValueInList 는 PostForm 쿼리시 Value값이 1개라면 값을 리턴한다.
@@ -197,7 +205,8 @@ func Webserver() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
+	//http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
+	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(assets)))
 	http.HandleFunc("/search", search)
 	http.HandleFunc("/", index)
 	http.HandleFunc("/api/setlog", handleAPISetLog)

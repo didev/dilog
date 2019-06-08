@@ -2,15 +2,13 @@ package main
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 	"text/template"
 )
 
 //템플릿 함수를 로딩합니다.
 var funcMap = template.FuncMap{
-	"addLink":  addLink,
-	"num2list": num2pagelist,
+	"addLink": addLink,
 }
 
 // addLink templatefunc 는 로그내용에 *flagProtocolPath에서 선언한 경로문자열이 포함된다면 dilink:// 링크를 생성시킨다.
@@ -32,12 +30,4 @@ func addLink(log string) string {
 		}
 	}
 	return rstring
-}
-
-func num2pagelist(num int) []string {
-	var page []string
-	for i := 1; i < num+1; i++ {
-		page = append(page, strconv.Itoa(i))
-	}
-	return page
 }
