@@ -54,7 +54,7 @@ func main() {
 	flag.Parse()
 	// webserver
 	if regexpPort.MatchString(*flagHTTP) {
-		templates = template.Must(template.New("main").ParseGlob("assets/template/*"))
+		templates = template.Must(template.New("main").Funcs(funcMap).ParseGlob("assets/template/*"))
 		Webserver()
 	}
 	//find mode

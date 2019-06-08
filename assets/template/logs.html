@@ -23,7 +23,7 @@
                 <td width=5%><a href="/log/{{.Tool}}">{{.Tool}}</a></td>
                 <td width=10%><a href="/log/{{.Tool}}/{{.Project}}">{{.Project}}</a></td>
                 <td width=10%><a href="/log/{{.Tool}}/{{.Project}}/{{.Slug}}">{{.Slug}}</a></td>
-                <td width=45%>{{.Log}}</td>
+                <td width=45%>{{addLink .Log}}</td>
             </tr>
         {{end}}
     </table>
