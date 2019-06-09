@@ -8,7 +8,8 @@
 조직에서 만들어지는 툴중 로그에 대한 기록이 필요할 경우가 있습니다. 프로젝트 매니징툴의 로그를 기록하기위해 만들었지만, 다른툴에서도 활용할 수 있도록 제작했습니다.
 
 ### Download
-실행파일 하나만 필요합니다. 다운로드 합니다.
+실행파일 하나만 필요합니다.
+하나의 파일로 클라이언트 명령어, 웹서버 및 restAPI 기능을 사용할 수 있습니다.
 
 - [Linux 64bit](https://github.com/digital-idea/dilog/releases/download/v1.0/dilog_linux_x86-64.tgz)
 - [macOS 64bit](https://github.com/digital-idea/dilog/releases/download/v1.0/dilog_darwin_x86-64.tgz)
