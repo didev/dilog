@@ -87,5 +87,13 @@ circle 프로젝트에 SS_0010_org 샷의 데일리 로그라고 생각해보겠
 $ dilog -tool terminal -project circle -slug SS_0010_org -log "daily: ~/project/circle/test.mov"
 ```
 
-데이터 입력후 웹에서 검색을 할 수 있습니다. 로그내용에 경로가 있다면 dilink 프로토콜과 연동되며 응용프로그램과 물릴 수 있습니다.
+데이터 입력후 웹에서 검색을 할 수 있습니다. 로그내용에 경로가 있다면 [dilink 프로토콜](https://github.com/digital-idea/dilink)과 연동되며 응용프로그램과 물릴 수 있습니다.
 ![screenshot](figures/ex_daily.png)
+
+## Developer
+- Maintainer: HanwoongKim(hello@lazypic.org)
+- Committer: 
+- Contributors: 
+
+## License
+BSD 3-Clause License
