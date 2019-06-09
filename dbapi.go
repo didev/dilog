@@ -177,14 +177,12 @@ func findDB(words string, page int) ([]Log, int, error) {
 func rmDB(id string) (bool, error) {
 	session, err := mgo.Dial(*flagDBIP)
 	if err != nil {
-		log.Println("DB Connet Err : ", err)
 		return false, err
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	err = session.DB(*flagDBName).C(*flagCollectionName).Remove(bson.M{"id": id})
 	if err != nil {
-		log.Println("DB Remove Err : ", err)
 		return false, err
 	}
 	return true, nil

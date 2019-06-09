@@ -14,6 +14,7 @@ import (
 var (
 	// server setting
 	regexpPort         = regexp.MustCompile(`:\d{2,5}$`)
+	regexpID           = regexp.MustCompile(`\d{13}$`)
 	flagHTTP           = flag.String("http", "", "dilog service port ex):8080")
 	flagDBIP           = flag.String("dbip", "127.0.0.1", "Mongodb ip")
 	flagDBName         = flag.String("dbname", "dilog", "Mongodb database name")
@@ -31,7 +32,8 @@ var (
 	// find mode
 	flagFind = flag.String("find", "", "search word")
 	// remove mode
-	flagRm = flag.Bool("rm", false, "Delete data older than keep days")
+	flagRm   = flag.Bool("rm", false, "Delete data older than keep days")
+	flagRmID = flag.String("rmid", "", "ID number to dalete")
 	// flag help
 	flagHelp = flag.Bool("help", false, "print help")
 )
@@ -52,6 +54,7 @@ func username() string {
 
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
+	log.SetPrefix("dilog: ")
 	flag.Parse()
 
 	// webserver
@@ -62,7 +65,7 @@ func main() {
 		Webserver()
 	}
 
-	//remove mode
+	// remove mode
 	if *flagRm {
 		itemlist, err := allDB()
 		if err != nil {
@@ -83,6 +86,18 @@ func main() {
 		}
 		return
 	}
+	// remove id mode
+	if regexpID.MatchString(*flagRmID) {
+		rmbool, err := rmDB(*flagRmID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if rmbool {
+			return
+		}
+		fmt.Println("해당 id를 삭제할 수 없습니다.")
+		return
+	}
 	// add mode
 	if *flagTool != "" && *flagLog != "" {
 		if *flagUser == "" {
@@ -94,7 +109,7 @@ func main() {
 		}
 		err = addDB(ip, *flagLog, *flagProject, *flagSlug, *flagTool, *flagUser, *flagKeep)
 		if err != nil {
-			log.Fatal("DB장애로 로그를 추가할 수 없습니다.")
+			log.Fatal(err)
 		}
 		return
 	}
