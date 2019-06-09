@@ -7,7 +7,21 @@ import (
 	"net"
 	"net/http"
 	"strconv"
+	"text/template"
+
+	rice "github.com/GeertJohan/go.rice"
 )
+
+type recipe struct {
+	Searchword   string
+	Tool         string
+	Project      string
+	Slug         string
+	Logs         []Log
+	Page         int
+	TotalPagenum []string
+	Error        string
+}
 
 func num2pagelist(num int) []string {
 	var page []string
@@ -19,29 +33,13 @@ func num2pagelist(num int) []string {
 
 func index(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
-	type recipe struct {
-		Searchword string
-		Tool       string
-		Project    string
-		Slug       string
-		Logs       []Log
-	}
 	rcp := recipe{}
-	tmpl.ExecuteTemplate(w, "index", rcp)
+	tmpl.Execute(w, rcp)
 }
 
 func search(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 	q := r.URL.Query()
-	type recipe struct {
-		Searchword   string
-		Tool         string
-		Project      string
-		Slug         string
-		Logs         []Log
-		Page         int
-		TotalPagenum []string
-	}
 	rcp := recipe{}
 	rcp.Searchword = q.Get("searchword")
 	rcp.Tool = q.Get("tool")
@@ -54,7 +52,8 @@ func search(w http.ResponseWriter, r *http.Request) {
 		pagenum, err := strconv.Atoi(page)
 		if err != nil {
 			log.Println(err)
-			tmpl.ExecuteTemplate(w, "dberr", nil)
+			rcp.Error = err.Error()
+			tmpl.Execute(w, nil)
 			return
 		}
 		rcp.Page = pagenum
@@ -64,52 +63,56 @@ func search(w http.ResponseWriter, r *http.Request) {
 	if rcp.Tool != "" && rcp.Project != "" && rcp.Slug != "" {
 		logs, totalPagenum, err := findtpsDB(rcp.Tool, rcp.Project, rcp.Slug, rcp.Page)
 		if err != nil {
-			log.Println("findtpsDB")
-			tmpl.ExecuteTemplate(w, "dberr", nil)
+			log.Println(err)
+			rcp.Error = err.Error()
+			tmpl.Execute(w, nil)
 			return
 		}
 		rcp.Logs = logs
 		rcp.TotalPagenum = num2pagelist(totalPagenum)
-		tmpl.ExecuteTemplate(w, "result", rcp)
+		tmpl.Execute(w, rcp)
 		return
 	}
 	if rcp.Tool != "" && rcp.Project != "" {
 		logs, totalPagenum, err := findtpDB(rcp.Tool, rcp.Project, rcp.Page)
 		if err != nil {
-			log.Println("findtpDB")
-			tmpl.ExecuteTemplate(w, "dberr", nil)
+			log.Println(err)
+			rcp.Error = err.Error()
+			tmpl.Execute(w, nil)
 			return
 		}
 		rcp.Logs = logs
 		rcp.TotalPagenum = num2pagelist(totalPagenum)
-		tmpl.ExecuteTemplate(w, "result", rcp)
+		tmpl.Execute(w, rcp)
 		return
 	}
 	if rcp.Tool != "" {
 		logs, totalPagenum, err := findtDB(rcp.Tool, rcp.Page)
 		if err != nil {
-			log.Println("findtDB")
-			tmpl.ExecuteTemplate(w, "dberr", nil)
+			log.Println(err)
+			rcp.Error = err.Error()
+			tmpl.Execute(w, nil)
 			return
 		}
 		rcp.Logs = logs
 		rcp.TotalPagenum = num2pagelist(totalPagenum)
-		tmpl.ExecuteTemplate(w, "result", rcp)
+		tmpl.Execute(w, rcp)
 		return
 	}
 	if rcp.Searchword != "" {
 		logs, totalPagenum, err := findDB(rcp.Searchword, rcp.Page)
 		if err != nil {
-			log.Println("findDB")
-			tmpl.ExecuteTemplate(w, "dberr", nil)
+			log.Println(err)
+			rcp.Error = err.Error()
+			tmpl.Execute(w, nil)
 			return
 		}
 		rcp.Logs = logs
 		rcp.TotalPagenum = num2pagelist(totalPagenum)
-		tmpl.ExecuteTemplate(w, "result", rcp)
+		tmpl.Execute(w, rcp)
 		return
 	}
-	tmpl.ExecuteTemplate(w, "result", rcp)
+	tmpl.Execute(w, rcp)
 }
 
 // PostFormValueInList 는 PostForm 쿼리시 Value값이 1개라면 값을 리턴한다.
@@ -199,13 +202,34 @@ func handleAPISetLog(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// RoadTemplate 함수는 템플릿 이름을 받아서 글로벌 template 포인터에 적용한다.
+// 템플릿 데이터를 바이너리에 넣기 위해서 rice를 사용한다.
+func RoadTemplate(templateName string) {
+	// teamplate 로딩
+	templateBox, err := rice.FindBox("assets/template")
+	if err != nil {
+		log.Fatal(err)
+	}
+	// get file contents as string
+	templateString, err := templateBox.String(templateName + ".html")
+	if err != nil {
+		log.Fatal(err)
+	}
+	// parse and execute the template
+	t, err := template.New(templateName).Funcs(funcMap).Parse(templateString)
+	if err != nil {
+		log.Fatal(err)
+	}
+	tmpl = t
+}
+
 // Webserver 함수는 웹서버를 실행합니다.
 func Webserver() {
 	ip, err := serviceIP()
 	if err != nil {
 		log.Fatal(err)
 	}
-	//http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
+	RoadTemplate("dilog")
 	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(assets)))
 	http.HandleFunc("/search", search)
 	http.HandleFunc("/", index)

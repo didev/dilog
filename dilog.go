@@ -9,8 +9,6 @@ import (
 	"regexp"
 	"runtime"
 	"text/template"
-
-	rice "github.com/GeertJohan/go.rice"
 )
 
 var (
@@ -55,27 +53,10 @@ func username() string {
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	flag.Parse()
-	// test rice, 먼저 파일을 하나 만들고 테스트 진행할 것.
-	templateBox, err := rice.FindBox("assets/template")
-	if err != nil {
-		log.Fatal(err)
-	}
-	// get file contents as string
-	templateString, err := templateBox.String("result.html")
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(templateString)
-	// parse and execute the template
-	tmplMessage, err := template.New("message").Parse(templateString)
-	if err != nil {
-		log.Fatal(err)
-	}
-	tmplMessage.Execute(os.Stdout, map[string]string{"Searchword": "woong"})
 
 	// webserver
 	if regexpPort.MatchString(*flagHTTP) {
-		tmpl = template.Must(template.New("main").Funcs(funcMap).ParseGlob("assets/template/*.html"))
+		//tmpl = template.Must(template.New("main").Funcs(funcMap).ParseGlob("assets/template/*.html"))
 		//tmpl, _ = vfstemplate.ParseGlob(assets, tmpl, "/template/*.html")
 
 		Webserver()

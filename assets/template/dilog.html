@@ -1,0 +1,91 @@
+{{define "dilog" }}
+<!DOCTYPE html>
+<head>
+        <title>dilog</title>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="/assets/bootstrap-4/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/assets/css/dilog.css">
+        <link rel="icon" type="image/png" href="/assets/img/dilog.png">
+</head>
+<body>
+<!--info-->
+<div class="info pl-5 pb-2 pt-1 text-secondary">
+        Info:
+        {{if .Tool}}
+                {{.Tool}}
+                {{if .Project}}
+                > {{.Project}}
+                {{if .Slug}}
+                > {{.Slug}}
+                {{end}}
+                {{end}}
+        {{end}}
+</div>
+<!--searchbox-->
+<div class="container p-3">
+        <div class="row justify-content-center align-items-center p-3">
+                <form action="/search" method="POST" name="checkboxs" class="editform text-center">
+                <div class="input-group">
+                        <input class="form-control bg-dark text-light" id="search" placeholder="Search word.." type="text" maxlength="50" size=50 name="searchword" autofocus="autofocus" value="{{.Searchword}}">
+                        <div class="input-group-append">
+                        <button class="btn btn-dark border-light" id="button">Search</button>
+                        </div>
+                </div>
+                </form>
+        </div>
+</div>
+
+<!--print log-->
+<div class="p-5">
+        {{if .Error}}
+        <div class="text-danger text-center">
+                {{.Error}}
+        </div>
+        {{else if .Logs}}
+                <div class="row text-warning mb-3">
+                        <div class="col-lg-2">Time</div>
+                        <div class="col-lg-1">Keep</div>
+                        <div class="col-lg-1">IP</div>
+                        <div class="col-lg-1">User</div>
+                        <div class="col-lg-1">Tool</div>
+                        <div class="col-lg-1">Project</div>
+                        <div class="col-lg-1">Slug</div>
+                        <div class="col-lg-4">Logs</div>
+                </div>
+                {{range .Logs}}
+                <div class="row text-secondary mb-1">
+                        <div class="col-lg-2">{{.Time}}</div>
+                        <div class="col-lg-1">{{.Keep}}</div>
+                        <div class="col-lg-1 h6 small">{{.Cip}}</div>
+                        <div class="col-lg-1">{{.User}}</div>
+                        <div class="col-lg-1"><a href="/search?tool={{.Tool}}&page=1">{{.Tool}}</a></div>
+                        <div class="col-lg-1"><a href="/search?tool={{.Tool}}&project={{.Project}}&page=1" class="text-success">{{.Project}}</a></div>
+                        <div class="col-lg-1"><a href="/search?tool={{.Tool}}&project={{.Project}}&slug={{.Slug}}&page=1" class="text-info">{{.Slug}}</a></div>
+                        <div class="col-lg-4 text-white">{{addLink .Log}}</div>
+                </div>
+                <hr/>
+                {{end}}
+                
+        
+        {{else}}
+                <div class="text-warning text-center">
+                No Result.
+                </div>
+        {{end}}
+        
+</div>
+
+<!--print page-->
+<div class="pages text-center m-5">
+        {{range .TotalPagenum}}
+                <a href="/search?tool={{$.Tool}}&project={{$.Project}}&searchword={{$.Searchword}}&slug={{$.Slug}}&page={{.}}" class="btn btn-dark btn-sm">{{.}}</a>
+        {{end}}
+</div>
+        
+<footer class="footer text-center text-secondary">
+        © 2019 digitalidea & lazypic
+</footer>
+</body>
+<script src="/assets/bootstrap-4/js/bootstrap.min.js"></script>
+</html>
+{{end}}
