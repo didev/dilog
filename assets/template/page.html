@@ -1,7 +1,0 @@
-{{define "page"}}
-<div class="pages text-center m-5">
-    {{range .TotalPagenum}}
-        <a href="/search?tool={{$.Tool}}&project={{$.Project}}&searchword={{$.Searchword}}&slug={{$.Slug}}&page={{.}}" class="btn btn-dark btn-sm">{{.}}</a>
-    {{end}}
-</div>
-{{end}}
