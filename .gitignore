@@ -2,3 +2,4 @@ bin
 *.swp
 .DS_Store
 assets_vfsdata.go
+/bin
