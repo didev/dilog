@@ -78,3 +78,14 @@ id를 이용해서 하나의 로그를 삭제할 수 있습니다.
 ```
 $ dilog -rmid 0000000000000
 ```
+
+## 응용
+여러 응용법이 있습니다. 아래처럼 로그를 입력합니다.
+circle 프로젝트에 SS_0010_org 샷의 데일리 로그라고 생각해보겠습니다.
+
+```bash
+$ dilog -tool terminal -project circle -slug SS_0010_org -log "daily: ~/project/circle/test.mov"
+```
+
+데이터 입력후 웹에서 검색을 할 수 있습니다. 로그내용에 경로가 있다면 dilink 프로토콜과 연동되며 응용프로그램과 물릴 수 있습니다.
+![screenshot](figures/ex_daily.png)
