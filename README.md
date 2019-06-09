@@ -10,22 +10,22 @@
 ### Download
 바이너리 하나만 필요합니다. 다운로드 합니다.
 
-- Linux:
-- macOS:
-- Windows:
+- [Linux 64bit](https://github.com/digital-idea/dilog/releases/download/v1.0/dilog_linux_x86-64.tgz)
+- [macOS 64bit](https://github.com/digital-idea/dilog/releases/download/v1.0/dilog_darwin_x86-64.tgz)
+- [Windows 64bit](https://github.com/digital-idea/dilog/releases/download/v1.0/dilog_windows_x86-64.tgz)
 
 ### mongoDB 설치, 실행
 monogoDB를 설치하고 실행합니다.
 
-macOS
 ```bash
+$ sudo yum install mongodb mongodb-server // CentOS
 $ brew install mongodb // macOS
-$ mongod
 ```
 
-CentOS
-```bash
-$ sudo yum install mongodb mongodb-server
+monogoDB 실행(서비스로 돌리는것은 이곳에서 설명하지 않습니다.)
+
+```
+# mongod
 ```
 
 ### 서버실행
