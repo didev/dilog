@@ -3,3 +3,4 @@ bin
 .DS_Store
 assets_vfsdata.go
 /bin
+coverage.txt
