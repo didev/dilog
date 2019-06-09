@@ -3,12 +3,10 @@ language: go
 go:
  - 1.12.x
 
-env:
-- DB=mongodb
-- TOOL=dilog
+before_script:
+ - go run ./assets/asset_generate.go
 
 script:
- - go run ./assets/asset_generate.go
  - go test -race -coverprofile=coverage.txt -covermode=atomic ./...
  - go vet ./...
 
