@@ -99,6 +99,16 @@ $ dilog -tool terminal -project circle -slug SS_0010_org -log "daily: ~/project/
 ![screenshot](figures/ex_daily.png)
 
 ## Developer
+
+### Need
+
+빌드를 위해서 아래 라이브러리를 사용합니다.
+
+```
+$ go get github.com/GeertJohan/go.rice
+$ go get github.com/GeertJohan/go.rice/rice
+```
+
 - Maintainer: HanwoongKim(hello@lazypic.org)
 - Committer: 
 - Contributors: 
