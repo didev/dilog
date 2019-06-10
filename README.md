@@ -29,6 +29,7 @@ monogoDB 실행
 
 ```
 # mongod
+$ brew services start mongodb // macOS
 ```
 
 ### 로그서버 실행
@@ -77,6 +78,13 @@ id를 이용해서 하나의 로그를 삭제할 수 있습니다.
 
 ```
 $ dilog -rmid 0000000000000
+```
+
+### 로그접근
+아래 형태의 url을 통해서 로그서버에 접근할 수 있습니다.
+
+```
+http://127.0.0.1/search?project=circle&slug=SS_0010
 ```
 
 ## 응용
