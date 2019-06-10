@@ -157,6 +157,7 @@ func findDB(words string, page int) ([]Log, int, error) {
 			bson.M{"project": &bson.RegEx{Pattern: word, Options: "i"}},
 			bson.M{"slug": &bson.RegEx{Pattern: word, Options: "i"}},
 			bson.M{"time": &bson.RegEx{Pattern: word, Options: "i"}},
+			bson.M{"time": word},
 			bson.M{"tool": &bson.RegEx{Pattern: word, Options: "i"}},
 			bson.M{"user": &bson.RegEx{Pattern: word, Options: "i"}},
 		}})
