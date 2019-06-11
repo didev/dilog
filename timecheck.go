@@ -20,5 +20,5 @@ func timecheck(timestr string, keepdate int) bool {
 	}
 	addtime := t.AddDate(0, 0, keepdate)
 	now := time.Now()
-	return now.After(addtime) //추후 이 결과를 이용해서 참이면 리무브 대상이다.
+	return addtime.After(now) //추후 이 결과를 이용해서 참이면 리무브 대상이다.
 }
