@@ -73,30 +73,20 @@ func main() {
 		}
 		for _, i := range itemlist {
 			if timecheck(i.Time, i.Keep) {
-				rmbool, err := rmDB(i.ID)
+				err := rmDB(i.ID)
 				if err != nil {
 					log.Fatal(err)
 				}
-				if rmbool {
-					return
-				}
-				fmt.Println("해당 slug를 삭제할 수 없습니다.")
-				return
 			}
 		}
 		return
 	}
 	// remove id mode
 	if regexpID.MatchString(*flagRmID) {
-		rmbool, err := rmDB(*flagRmID)
+		err := rmDB(*flagRmID)
 		if err != nil {
 			log.Fatal(err)
 		}
-		if rmbool {
-			return
-		}
-		fmt.Println("해당 id를 삭제할 수 없습니다.")
-		return
 	}
 	// add mode
 	if *flagTool != "" && *flagLog != "" {
