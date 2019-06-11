@@ -87,6 +87,11 @@ $ dilog -rmid 0000000000000
 http://127.0.0.1/search?project=circle&slug=SS_0010
 ```
 
+검색: daily, 2019-06-10
+```
+http://127.0.0.1/search?searchword=daily+2019-06-10
+```
+
 ## 응용
 여러 응용법이 있습니다. 아래처럼 로그를 입력합니다.
 circle 프로젝트에 SS_0010_org 샷의 데일리 로그라고 생각해보겠습니다.
