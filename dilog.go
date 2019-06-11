@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"os"
 	"os/user"
@@ -59,9 +58,6 @@ func main() {
 
 	// webserver
 	if regexpPort.MatchString(*flagHTTP) {
-		//tmpl = template.Must(template.New("main").Funcs(funcMap).ParseGlob("assets/template/*.html"))
-		//tmpl, _ = vfstemplate.ParseGlob(assets, tmpl, "/template/*.html")
-
 		Webserver()
 	}
 
@@ -69,7 +65,7 @@ func main() {
 	if *flagRm {
 		itemlist, err := allDB()
 		if err != nil {
-			log.Fatal("DB장애로 처리할 수 없습니다.")
+			log.Fatal(err)
 		}
 		for _, i := range itemlist {
 			if timecheck(i.Time, i.Keep) {
@@ -103,6 +99,5 @@ func main() {
 		}
 		return
 	}
-	fmt.Println("Digitalidea log server")
 	flag.PrintDefaults()
 }
