@@ -12,11 +12,11 @@
 <div class="info pl-5 pb-2 pt-1 text-secondary">
         Info:
         {{if .Tool}}
-                {{.Tool}}
+                <span class="text-primary">{{.Tool}}</span>
                 {{if .Project}}
-                > {{.Project}}
+                > <span class="text-success">{{.Project}}</span>
                 {{if .Slug}}
-                > {{.Slug}}
+                > <span class="text-info">{{.Slug}}</span>
                 {{end}}
                 {{end}}
         {{end}}
@@ -43,27 +43,23 @@
         </div>
         {{else if .Logs}}
                 <div class="row text-warning mb-3">
-                        <div class="col-lg-2">Time</div>
-                        <div class="col-lg-1">ID</div>
+                        <div class="col-lg-2">Time / ID</div>
                         <div class="col-lg-1">Keep</div>
-                        <div class="col-lg-1">IP</div>
-                        <div class="col-lg-1">User</div>
+                        <div class="col-lg-1">User / IP</div>
                         <div class="col-lg-1">Tool</div>
                         <div class="col-lg-1">Project</div>
                         <div class="col-lg-1">Slug</div>
-                        <div class="col-lg-3">Logs</div>
+                        <div class="col-lg-5">Logs</div>
                 </div>
                 {{range .Logs}}
                 <div class="row text-secondary mb-1">
-                        <div class="col-lg-2">{{.Time}}</div>
-                        <div class="col-lg-1">{{.ID}}</div>
+                        <div class="col-lg-2">{{.Time}}<br>{{.ID}}</div>
                         <div class="col-lg-1">{{.Keep}}</div>
-                        <div class="col-lg-1">{{.Cip}}</div>
-                        <div class="col-lg-1">{{.User}}</div>
+                        <div class="col-lg-1">{{.User}}<br>{{.Cip}}</div>
                         <div class="col-lg-1"><a href="/search?tool={{.Tool}}&page=1">{{.Tool}}</a></div>
                         <div class="col-lg-1"><a href="/search?tool={{.Tool}}&project={{.Project}}&page=1" class="text-success">{{.Project}}</a></div>
                         <div class="col-lg-1"><a href="/search?tool={{.Tool}}&project={{.Project}}&slug={{.Slug}}&page=1" class="text-info">{{.Slug}}</a></div>
-                        <div class="col-lg-3 text-white">{{addLink .Log}}</div>
+                        <div class="col-lg-5 text-white">{{addLink .Log}}</div>
                 </div>
                 <hr/>
                 {{end}}
@@ -84,9 +80,9 @@
         {{end}}
 </div>
         
-<footer class="footer text-center text-secondary">
+<div class="footer text-center text-secondary p-3">
         © 2019 <a href="https://lazypic.org" class="text-secondary">lazypic</a> & <a href="http://www.digitalidea.co.kr" class="text-secondary">digitalidea</a>
-</footer>
+</div>
 </body>
 <script src="/assets/bootstrap-4/js/bootstrap.min.js"></script>
 </html>

@@ -19,7 +19,7 @@ var (
 	flagDBIP           = flag.String("dbip", "127.0.0.1", "Mongodb ip")
 	flagDBName         = flag.String("dbname", "dilog", "Mongodb database name")
 	flagCollectionName = flag.String("collection", "logs", "Mongodb database name")
-	flagPagenum        = flag.Int("pagenum", 20, "Number of items on page")
+	flagPagenum        = flag.Int("pagenum", 10, "Number of items on page")
 	flagProtocolPath   = flag.String("protocolpath", "/show,/lustre,/project", "A path-aware string to associate with the protocol(dilink). Separate each character with a comma.")
 	tmpl               = template.New("main")
 	// add mode
