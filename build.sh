@@ -20,9 +20,9 @@ cd ./bin/linux/ && tar -zcvf ../${APP}_linux_x86-64.tgz . && cd -
 cd ./bin/windows/ && tar -zcvf ../${APP}_windows_x86-64.tgz . && cd -
 cd ./bin/darwin/ && tar -zcvf ../${APP}_darwin_x86-64.tgz . && cd -
 
-cd ./bin/linux_di/ && tar -zcvf ../${APP}_linux_x86-64.tgz . && cd -
-cd ./bin/windows_di/ && tar -zcvf ../${APP}_windows_x86-64.tgz . && cd -
-cd ./bin/darwin_di/ && tar -zcvf ../${APP}_darwin_x86-64.tgz . && cd -
+cd ./bin/linux_di/ && tar -zcvf ../${APP}_linux_di_x86-64.tgz . && cd -
+cd ./bin/windows_di/ && tar -zcvf ../${APP}_windows_di_x86-64.tgz . && cd -
+cd ./bin/darwin_di/ && tar -zcvf ../${APP}_darwin_di_x86-64.tgz . && cd -
 
 # 삭제
 rm -rf ./bin/linux
