@@ -11,11 +11,14 @@ import (
 )
 
 var (
+	// DBIP 값은 컴파일 단계에서 회사에 따라 값이 바뀐다.
+	DBIP = "127.0.0.1"
+
 	// server setting
 	regexpPort         = regexp.MustCompile(`:\d{2,5}$`)
 	regexpID           = regexp.MustCompile(`\d{13}$`)
 	flagHTTP           = flag.String("http", "", "dilog service port ex):8080")
-	flagDBIP           = flag.String("dbip", "127.0.0.1", "Mongodb ip")
+	flagDBIP           = flag.String("dbip", DBIP, "MongoDB IP")
 	flagDBName         = flag.String("dbname", "dilog", "Mongodb database name")
 	flagCollectionName = flag.String("collection", "log", "Mongodb database name")
 	flagPagenum        = flag.Int("pagenum", 10, "Number of items on page")

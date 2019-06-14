@@ -11,12 +11,24 @@ GOOS=linux GOARCH=amd64 go build -o ./bin/linux/${APP} dilog.go struct.go dbapi.
 GOOS=windows GOARCH=amd64 go build -o ./bin/windows/${APP}.exe dilog.go struct.go dbapi.go network.go timecheck.go http.go templatefunc.go assets_vfsdata.go rice-box.go
 GOOS=darwin GOARCH=amd64 go build -o ./bin/darwin/${APP} dilog.go struct.go dbapi.go network.go timecheck.go http.go templatefunc.go assets_vfsdata.go rice-box.go
 
+GOOS=linux GOARCH=amd64 go build -ldflags "-X main.DBIP=10.0.90.251" -o ./bin/linux_di/${APP} dilog.go struct.go dbapi.go network.go timecheck.go http.go templatefunc.go assets_vfsdata.go rice-box.go
+GOOS=windows GOARCH=amd64 go build -ldflags "-X main.DBIP=10.0.90.251" -o ./bin/windows_di/${APP}.exe dilog.go struct.go dbapi.go network.go timecheck.go http.go templatefunc.go assets_vfsdata.go rice-box.go
+GOOS=darwin GOARCH=amd64 go build -ldflags "-X main.DBIP=10.0.90.251" -o ./bin/darwin_di/${APP} dilog.go struct.go dbapi.go network.go timecheck.go http.go templatefunc.go assets_vfsdata.go rice-box.go
+
 # Github Release에 업로드 하기위해 압축
 cd ./bin/linux/ && tar -zcvf ../${APP}_linux_x86-64.tgz . && cd -
 cd ./bin/windows/ && tar -zcvf ../${APP}_windows_x86-64.tgz . && cd -
 cd ./bin/darwin/ && tar -zcvf ../${APP}_darwin_x86-64.tgz . && cd -
 
+cd ./bin/linux_di/ && tar -zcvf ../${APP}_linux_x86-64.tgz . && cd -
+cd ./bin/windows_di/ && tar -zcvf ../${APP}_windows_x86-64.tgz . && cd -
+cd ./bin/darwin_di/ && tar -zcvf ../${APP}_darwin_x86-64.tgz . && cd -
+
 # 삭제
 rm -rf ./bin/linux
 rm -rf ./bin/windows
 rm -rf ./bin/darwin
+
+rm -rf ./bin/linux_di
+rm -rf ./bin/windows_di
+rm -rf ./bin/darwin_di
