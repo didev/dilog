@@ -16,14 +16,12 @@ var (
 	DBIP = "127.0.0.1"
 
 	// server setting
-	regexpPort         = regexp.MustCompile(`:\d{2,5}$`)
-	regexpID           = regexp.MustCompile(`\d{13}$`)
-	flagHTTP           = flag.String("http", "", "dilog service port ex):8080")
-	flagDBIP           = flag.String("dbip", DBIP, "MongoDB IP")
-	flagDBName         = flag.String("dbname", "dilog", "Mongodb database name")
-	flagCollectionName = flag.String("collection", "log", "Mongodb database name")
-	flagPagenum        = flag.Int("pagenum", 10, "Number of items on page")
-	flagProtocolPath   = flag.String("protocolpath", "/show,/lustre,/project,/storage", "A path-aware string to associate with the protocol(dilink). Separate each character with a comma.")
+	regexpPort       = regexp.MustCompile(`:\d{2,5}$`)
+	regexpID         = regexp.MustCompile(`\d{13}$`)
+	flagHTTP         = flag.String("http", "", "dilog service port ex):8080")
+	flagDBIP         = flag.String("dbip", DBIP, "MongoDB IP")
+	flagPagenum      = flag.Int("pagenum", 10, "Number of items on page")
+	flagProtocolPath = flag.String("protocolpath", "/show,/lustre,/project,/storage", "A path-aware string to associate with the protocol(dilink). Separate each character with a comma.")
 	// add mode
 	flagTool    = flag.String("tool", "", "tool name")
 	flagProject = flag.String("project", "", "project name")
