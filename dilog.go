@@ -1,7 +1,6 @@
 package dilog
 
 import (
-	"log"
 	"strconv"
 	"strings"
 	"time"
@@ -34,7 +33,6 @@ type Log struct {
 func Add(dbip, ip, logstr, project, slug, tool, user string, keep int) error {
 	session, err := mgo.Dial(dbip)
 	if err != nil {
-		log.Println("DB Connect Err : ", err)
 		return err
 	}
 	defer session.Close()
@@ -54,7 +52,6 @@ func Add(dbip, ip, logstr, project, slug, tool, user string, keep int) error {
 	}
 	err = c.Insert(doc)
 	if err != nil {
-		log.Println("DB Insert Err : ", err)
 		return err
 	}
 	return nil
@@ -64,7 +61,6 @@ func Add(dbip, ip, logstr, project, slug, tool, user string, keep int) error {
 func All(dbip string) ([]Log, error) {
 	session, err := mgo.Dial(dbip)
 	if err != nil {
-		log.Println("DB Connect Err : ", err)
 		return nil, err
 	}
 	defer session.Close()
@@ -73,7 +69,6 @@ func All(dbip string) ([]Log, error) {
 	c := session.DB(DBNAME).C(COLLECTION)
 	err = c.Find(bson.M{}).All(&results)
 	if err != nil {
-		log.Println("DB Find Err : ", err)
 		return nil, err
 	}
 	return results, nil
@@ -83,7 +78,6 @@ func All(dbip string) ([]Log, error) {
 func FindTool(dbip, toolname string, page, pageMaxItemNum int) ([]Log, int, error) {
 	session, err := mgo.Dial(dbip)
 	if err != nil {
-		log.Println("DB Connect Err : ", err)
 		return nil, 0, err
 	}
 	defer session.Close()
@@ -93,12 +87,10 @@ func FindTool(dbip, toolname string, page, pageMaxItemNum int) ([]Log, int, erro
 	query := bson.M{"tool": &bson.RegEx{Pattern: toolname, Options: "i"}}
 	err = c.Find(query).Sort("-time").Skip((page - 1) * pageMaxItemNum).Limit(pageMaxItemNum).All(&results)
 	if err != nil {
-		log.Println("DB Find Err : ", err)
 		return nil, 0, err
 	}
 	itemNum, err := c.Find(query).Count()
 	if err != nil {
-		log.Println("DB Find Err : ", err)
 		return nil, 0, err
 	}
 	return results, totalPage(itemNum, pageMaxItemNum), nil
@@ -113,11 +105,10 @@ func totalPage(itemNum, pageMaxItemNum int) int {
 	return page
 }
 
-// FindtpDB 함수는 툴이름, 프로젝트 이름을 이용해서 log를 검색합니다.
+// FindToolProject 함수는 툴이름, 프로젝트 이름을 이용해서 log를 검색합니다.
 func FindToolProject(dbip, toolname, project string, page, pageMaxItemNum int) ([]Log, int, error) {
 	session, err := mgo.Dial(dbip)
 	if err != nil {
-		log.Println("DB Connect Err : ", err)
 		return nil, 0, err
 	}
 	defer session.Close()
@@ -130,22 +121,19 @@ func FindToolProject(dbip, toolname, project string, page, pageMaxItemNum int) (
 	}}
 	err = c.Find(query).Sort("-time").Skip(page - 1).Limit(pageMaxItemNum).All(&results)
 	if err != nil {
-		log.Println("DB Find Err : ", err)
 		return nil, 0, err
 	}
 	itemNum, err := c.Find(query).Count()
 	if err != nil {
-		log.Println("DB Find Err : ", err)
 		return nil, 0, err
 	}
 	return results, totalPage(itemNum, pageMaxItemNum), nil
 }
 
-// FindtpsDB 함수는 툴이름, 프로젝트, Slug를 입력받아서 로그를 검색한다.
+// FindToolProjectSlug 함수는 툴이름, 프로젝트, Slug를 입력받아서 로그를 검색한다.
 func FindToolProjectSlug(dbip, toolname, project, slug string, page, pageMaxItemNum int) ([]Log, int, error) {
 	session, err := mgo.Dial(dbip)
 	if err != nil {
-		log.Println("DB Connect Err : ", err)
 		return nil, 0, err
 	}
 	defer session.Close()
@@ -159,12 +147,10 @@ func FindToolProjectSlug(dbip, toolname, project, slug string, page, pageMaxItem
 	}}
 	err = c.Find(query).Sort("-time").Skip((page - 1) * pageMaxItemNum).Limit(pageMaxItemNum).All(&results)
 	if err != nil {
-		log.Println("DB Find Err : ", err)
 		return nil, 0, err
 	}
 	itemNum, err := c.Find(query).Count()
 	if err != nil {
-		log.Println("DB Find Err : ", err)
 		return nil, 0, err
 	}
 	return results, totalPage(itemNum, pageMaxItemNum), nil
@@ -174,7 +160,6 @@ func FindToolProjectSlug(dbip, toolname, project, slug string, page, pageMaxItem
 func Search(dbip, words string, page, pageMaxItemNum int) ([]Log, int, error) {
 	session, err := mgo.Dial(dbip)
 	if err != nil {
-		log.Println("DB Connect Err : ", err)
 		return nil, 0, err
 	}
 	defer session.Close()
@@ -198,12 +183,10 @@ func Search(dbip, words string, page, pageMaxItemNum int) ([]Log, int, error) {
 	}
 	err = c.Find(bson.M{"$and": wordQueries}).Sort("-time").Skip((page - 1) * pageMaxItemNum).Limit(pageMaxItemNum).All(&results)
 	if err != nil {
-		log.Println("DB Find Err : ", err)
 		return nil, 0, err
 	}
 	itemNum, err := c.Find(bson.M{"$and": wordQueries}).Count()
 	if err != nil {
-		log.Println("DB Find Err : ", err)
 		return nil, 0, err
 	}
 	return results, totalPage(itemNum, pageMaxItemNum), nil
@@ -226,12 +209,12 @@ func Remove(dbip, id string) error {
 }
 
 // Timecheck 함수는 RFC3339 시간문자열과 보관일을 받아서 보관일이 지난지 체크한다.
-func Timecheck(timestr string, keepdate int) bool {
+func Timecheck(timestr string, keepdate int) (bool, error) {
 	t, err := time.Parse(time.RFC3339, timestr)
 	if err != nil {
-		log.Println(err)
+		return false, err
 	}
 	addtime := t.AddDate(0, 0, keepdate)
 	now := time.Now()
-	return addtime.After(now) //추후 이 결과를 이용해서 참이면 리무브 대상이다.
+	return addtime.After(now), nil //추후 이 결과를 이용해서 참이면 리무브 대상이다.
 }

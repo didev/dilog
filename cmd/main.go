@@ -69,7 +69,11 @@ func main() {
 			log.Fatal(err)
 		}
 		for _, i := range itemlist {
-			if dilog.Timecheck(i.Time, i.Keep) {
+			isDelete, err := dilog.Timecheck(i.Time, i.Keep)
+			if err != nil {
+				log.Fatal(err)
+			}
+			if isDelete {
 				err := dilog.Remove(*flagDBIP, i.ID)
 				if err != nil {
 					log.Fatal(err)
