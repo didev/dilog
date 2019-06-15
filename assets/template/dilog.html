@@ -12,11 +12,11 @@
 <div class="info pl-5 pb-2 pt-1 text-secondary">
         Info:
         {{if .Tool}}
-                <span class="text-primary">{{.Tool}}</span>
+                <a href="/search?tool={{.Tool}}&page=1">{{.Tool}}</a>
                 {{if .Project}}
-                > <span class="text-success">{{.Project}}</span>
+                > <a href="/search?tool={{.Tool}}&project={{.Project}}&page=1" class="text-success">{{.Project}}</a>
                 {{if .Slug}}
-                > <span class="text-info">{{.Slug}}</span>
+                > <a href="/search?tool={{.Tool}}&project={{.Project}}&slug={{.Slug}}&page=1" class="text-info">{{.Slug}}</a>
                 {{end}}
                 {{end}}
         {{end}}
@@ -45,21 +45,27 @@
                 <div class="row text-warning mb-3">
                         <div class="col-lg-2">Time / ID</div>
                         <div class="col-lg-1">Keep</div>
-                        <div class="col-lg-1">User / IP</div>
+                        <div class="col-lg-2">User / IP</div>
                         <div class="col-lg-1">Tool</div>
                         <div class="col-lg-1">Project</div>
-                        <div class="col-lg-1">Slug</div>
-                        <div class="col-lg-5">Logs</div>
+                        <div class="col-lg-2">Slug</div>
+                        <div class="col-lg-3">Logs</div>
                 </div>
                 {{range .Logs}}
                 <div class="row text-secondary mb-1">
                         <div class="col-lg-2">{{.Time}}<br>{{.ID}}</div>
                         <div class="col-lg-1">{{.Keep}}</div>
-                        <div class="col-lg-1">{{.User}}<br>{{.Cip}}</div>
+                        <div class="col-lg-2">{{.User}}<br>{{.Cip}}</div>
                         <div class="col-lg-1"><a href="/search?tool={{.Tool}}&page=1">{{.Tool}}</a></div>
                         <div class="col-lg-1"><a href="/search?tool={{.Tool}}&project={{.Project}}&page=1" class="text-success">{{.Project}}</a></div>
-                        <div class="col-lg-1"><a href="/search?tool={{.Tool}}&project={{.Project}}&slug={{.Slug}}&page=1" class="text-info">{{.Slug}}</a></div>
-                        <div class="col-lg-5 text-white">{{addLink .Log}}</div>
+                        <div class="col-lg-2"><a href="/search?tool={{.Tool}}&project={{.Project}}&slug={{.Slug}}&page=1" class="text-info">{{.Slug}}</a></div>
+                        <div class="col-lg-3 text-white">
+                                {{if getPath .Log}}
+                                        <a href="dilink://{{getPath .Log}}" class="text-white">{{.Log}}</a>
+                                {{else}}
+                                        {{.Log}}
+                                {{end}}
+                        </div>
                 </div>
                 <hr/>
                 {{end}}

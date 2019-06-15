@@ -7,7 +7,6 @@ import (
 	"os/user"
 	"regexp"
 	"runtime"
-	"text/template"
 )
 
 var (
@@ -23,7 +22,6 @@ var (
 	flagCollectionName = flag.String("collection", "log", "Mongodb database name")
 	flagPagenum        = flag.Int("pagenum", 10, "Number of items on page")
 	flagProtocolPath   = flag.String("protocolpath", "/show,/lustre,/project,/storage", "A path-aware string to associate with the protocol(dilink). Separate each character with a comma.")
-	tmpl               = template.New("main")
 	// add mode
 	flagTool    = flag.String("tool", "", "tool name")
 	flagProject = flag.String("project", "", "project name")

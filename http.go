@@ -3,14 +3,21 @@ package main
 import (
 	"errors"
 	"fmt"
+	"html/template"
 	"log"
 	"net"
 	"net/http"
 	"strconv"
-	"text/template"
 
-	rice "github.com/GeertJohan/go.rice"
+	"github.com/shurcooL/httpfs/html/vfstemplate"
 )
+
+// LoadTemplates 함수는 템플릿을 로딩합니다.
+func LoadTemplates() (*template.Template, error) {
+	t := template.New("").Funcs(funcMap)
+	t, err := vfstemplate.ParseGlob(assets, t, "/template/*.html")
+	return t, err
+}
 
 type recipe struct {
 	Searchword   string
@@ -32,12 +39,29 @@ func num2pagelist(num int) []string {
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
+	t, err := LoadTemplates()
+	if err != nil {
+		log.Println("loadTemplates:", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	w.Header().Set("Content-Type", "text/html")
 	rcp := recipe{}
-	tmpl.Execute(w, rcp)
+	err = t.ExecuteTemplate(w, "dilog", rcp)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 func search(w http.ResponseWriter, r *http.Request) {
+	t, err := LoadTemplates()
+	if err != nil {
+		log.Println("loadTemplates:", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	w.Header().Set("Content-Type", "text/html")
 	q := r.URL.Query()
 	rcp := recipe{}
@@ -53,8 +77,12 @@ func search(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Println(err)
 			rcp.Error = err.Error()
-			tmpl.Execute(w, nil)
-			return
+			err = t.ExecuteTemplate(w, "dilog", rcp)
+			if err != nil {
+				log.Println(err)
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
 		}
 		rcp.Page = pagenum
 	}
@@ -65,12 +93,22 @@ func search(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Println(err)
 			rcp.Error = err.Error()
-			tmpl.Execute(w, nil)
+			err = t.ExecuteTemplate(w, "dilog", rcp)
+			if err != nil {
+				log.Println(err)
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
 			return
 		}
 		rcp.Logs = logs
 		rcp.TotalPagenum = num2pagelist(totalPagenum)
-		tmpl.Execute(w, rcp)
+		err = t.ExecuteTemplate(w, "dilog", rcp)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 		return
 	}
 	if rcp.Tool != "" && rcp.Project != "" {
@@ -78,12 +116,22 @@ func search(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Println(err)
 			rcp.Error = err.Error()
-			tmpl.Execute(w, nil)
+			err = t.ExecuteTemplate(w, "dilog", rcp)
+			if err != nil {
+				log.Println(err)
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
 			return
 		}
 		rcp.Logs = logs
 		rcp.TotalPagenum = num2pagelist(totalPagenum)
-		tmpl.Execute(w, rcp)
+		err = t.ExecuteTemplate(w, "dilog", rcp)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 		return
 	}
 	if rcp.Tool != "" {
@@ -91,12 +139,22 @@ func search(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Println(err)
 			rcp.Error = err.Error()
-			tmpl.Execute(w, nil)
+			err = t.ExecuteTemplate(w, "dilog", rcp)
+			if err != nil {
+				log.Println(err)
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
 			return
 		}
 		rcp.Logs = logs
 		rcp.TotalPagenum = num2pagelist(totalPagenum)
-		tmpl.Execute(w, rcp)
+		err = t.ExecuteTemplate(w, "dilog", rcp)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 		return
 	}
 	if rcp.Searchword != "" {
@@ -104,15 +162,30 @@ func search(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Println(err)
 			rcp.Error = err.Error()
-			tmpl.Execute(w, nil)
+			err = t.ExecuteTemplate(w, "dilog", rcp)
+			if err != nil {
+				log.Println(err)
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
 			return
 		}
 		rcp.Logs = logs
 		rcp.TotalPagenum = num2pagelist(totalPagenum)
-		tmpl.Execute(w, rcp)
+		err = t.ExecuteTemplate(w, "dilog", rcp)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 		return
 	}
-	tmpl.Execute(w, rcp)
+	err = t.ExecuteTemplate(w, "dilog", rcp)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 // PostFormValueInList 는 PostForm 쿼리시 Value값이 1개라면 값을 리턴한다.
@@ -202,34 +275,12 @@ func handleAPISetLog(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// RoadTemplate 함수는 템플릿 이름을 받아서 글로벌 template 포인터에 적용한다.
-// 템플릿 데이터를 바이너리에 넣기 위해서 rice를 사용한다.
-func RoadTemplate(templateName string) {
-	// teamplate 로딩
-	templateBox, err := rice.FindBox("assets/template")
-	if err != nil {
-		log.Fatal(err)
-	}
-	// get file contents as string
-	templateString, err := templateBox.String(templateName + ".html")
-	if err != nil {
-		log.Fatal(err)
-	}
-	// parse and execute the template
-	t, err := template.New(templateName).Funcs(funcMap).Parse(templateString)
-	if err != nil {
-		log.Fatal(err)
-	}
-	tmpl = t
-}
-
 // Webserver 함수는 웹서버를 실행합니다.
 func Webserver() {
 	ip, err := serviceIP()
 	if err != nil {
 		log.Fatal(err)
 	}
-	RoadTemplate("dilog")
 	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(assets)))
 	http.HandleFunc("/search", search)
 	http.HandleFunc("/", index)

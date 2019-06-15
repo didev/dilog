@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
+	"html/template"
 	"strings"
-	"text/template"
 )
 
 //템플릿 함수를 로딩합니다.
