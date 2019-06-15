@@ -1,104 +1,237 @@
-package main
+package dilog
 
 import (
-	"flag"
 	"log"
-	"os"
-	"os/user"
-	"regexp"
-	"runtime"
+	"strconv"
+	"strings"
+	"time"
+
+	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 )
 
 var (
-	// DBIP 값은 컴파일 단계에서 회사에 따라 값이 바뀐다.
-	DBIP = "127.0.0.1"
-
-	// server setting
-	regexpPort         = regexp.MustCompile(`:\d{2,5}$`)
-	regexpID           = regexp.MustCompile(`\d{13}$`)
-	flagHTTP           = flag.String("http", "", "dilog service port ex):8080")
-	flagDBIP           = flag.String("dbip", DBIP, "MongoDB IP")
-	flagDBName         = flag.String("dbname", "dilog", "Mongodb database name")
-	flagCollectionName = flag.String("collection", "log", "Mongodb database name")
-	flagPagenum        = flag.Int("pagenum", 10, "Number of items on page")
-	flagProtocolPath   = flag.String("protocolpath", "/show,/lustre,/project,/storage", "A path-aware string to associate with the protocol(dilink). Separate each character with a comma.")
-	// add mode
-	flagTool    = flag.String("tool", "", "tool name")
-	flagProject = flag.String("project", "", "project name")
-	flagSlug    = flag.String("slug", "", "shot or asset name")
-	flagLog     = flag.String("log", "", "log strings")
-	flagKeep    = flag.Int("keep", 180, "Days to keep")
-	flagUser    = flag.String("user", "", "custom Username.")
-	// find mode
-	flagFind = flag.String("find", "", "search word")
-	// remove mode
-	flagRm   = flag.Bool("rm", false, "Delete data older than keep days")
-	flagRmID = flag.String("rmid", "", "ID number to dalete")
-	// flag help
-	flagHelp = flag.Bool("help", false, "print help")
+	// DBNAME 은 데이터베이스 이름이다.
+	DBNAME = "dilog"
+	// COLLECTION 은 MongoDB Collection 이름이다.
+	COLLECTION = "log"
 )
 
-func username() string {
-	user, err := user.Current()
-	if err != nil {
-		if runtime.GOOS == "darwin" {
-			return os.ExpandEnv("$USER")
-		} else if runtime.GOOS == "linux" {
-			return os.ExpandEnv("$USER")
-		} else {
-			return user.Username
-		}
-	}
-	return user.Username
+// Log 자료구조 이다.
+type Log struct {
+	Cip     string // Client IP
+	ID      string // log ID
+	Keep    int    // 보관일수
+	Log     string // 로그내용
+	Project string // 프로젝트
+	Slug    string // 로그에 입력되는 Slug 예) 프로젝트 매니징툴에서 사용되는 에셋명 또는 샷명
+	Time    string // 로그가 기입된 시간
+	Tool    string // 로그가 보내진 툴
+	User    string // 유저이름
 }
 
-func main() {
-	log.SetFlags(log.LstdFlags | log.Lshortfile)
-	log.SetPrefix("dilog: ")
-	flag.Parse()
+// Add 함수는 log 를 추가합니다.
+func Add(dbip, ip, logstr, project, slug, tool, user string, keep int) error {
+	session, err := mgo.Dial(dbip)
+	if err != nil {
+		log.Println("DB Connect Err : ", err)
+		return err
+	}
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB(DBNAME).C(COLLECTION)
+	now := time.Now()
+	id := strconv.Itoa(int(now.UnixNano() / int64(time.Millisecond)))
+	doc := Log{Cip: ip,
+		ID:      id,
+		Keep:    keep,
+		Log:     logstr,
+		Project: project,
+		Slug:    slug,
+		Time:    now.Format(time.RFC3339),
+		Tool:    tool,
+		User:    user,
+	}
+	err = c.Insert(doc)
+	if err != nil {
+		log.Println("DB Insert Err : ", err)
+		return err
+	}
+	return nil
+}
 
-	// webserver
-	if regexpPort.MatchString(*flagHTTP) {
-		Webserver()
+// All 는 DB의 모든 로그를 가지고 옵니다.
+func All(dbip string) ([]Log, error) {
+	session, err := mgo.Dial(dbip)
+	if err != nil {
+		log.Println("DB Connect Err : ", err)
+		return nil, err
 	}
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
+	var results []Log
+	c := session.DB(DBNAME).C(COLLECTION)
+	err = c.Find(bson.M{}).All(&results)
+	if err != nil {
+		log.Println("DB Find Err : ", err)
+		return nil, err
+	}
+	return results, nil
+}
 
-	// remove mode
-	if *flagRm {
-		itemlist, err := allDB()
-		if err != nil {
-			log.Fatal(err)
-		}
-		for _, i := range itemlist {
-			if timecheck(i.Time, i.Keep) {
-				err := rmDB(i.ID)
-				if err != nil {
-					log.Fatal(err)
-				}
-			}
-		}
-		return
+// FindTool 함수는 툴이름을 이용해서 log를 검색합니다.
+func FindTool(dbip, toolname string, page, pageMaxItemNum int) ([]Log, int, error) {
+	session, err := mgo.Dial(dbip)
+	if err != nil {
+		log.Println("DB Connect Err : ", err)
+		return nil, 0, err
 	}
-	// remove id mode
-	if regexpID.MatchString(*flagRmID) {
-		err := rmDB(*flagRmID)
-		if err != nil {
-			log.Fatal(err)
-		}
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
+	var results []Log
+	c := session.DB(DBNAME).C(COLLECTION)
+	query := bson.M{"tool": &bson.RegEx{Pattern: toolname, Options: "i"}}
+	err = c.Find(query).Sort("-time").Skip((page - 1) * pageMaxItemNum).Limit(pageMaxItemNum).All(&results)
+	if err != nil {
+		log.Println("DB Find Err : ", err)
+		return nil, 0, err
 	}
-	// add mode
-	if *flagTool != "" && *flagLog != "" {
-		if *flagUser == "" {
-			*flagUser = username()
-		}
-		ip, err := serviceIP()
-		if err != nil {
-			log.Fatal(err)
-		}
-		err = addDB(ip, *flagLog, *flagProject, *flagSlug, *flagTool, *flagUser, *flagKeep)
-		if err != nil {
-			log.Fatal(err)
-		}
-		return
+	itemNum, err := c.Find(query).Count()
+	if err != nil {
+		log.Println("DB Find Err : ", err)
+		return nil, 0, err
 	}
-	flag.PrintDefaults()
+	return results, totalPage(itemNum, pageMaxItemNum), nil
+}
+
+// TotalPage 함수는 아이템의 갯수를 이용해서 총 페이지수를 반환한다.
+func totalPage(itemNum, pageMaxItemNum int) int {
+	page := itemNum / pageMaxItemNum
+	if itemNum%pageMaxItemNum != 0 {
+		page++
+	}
+	return page
+}
+
+// FindtpDB 함수는 툴이름, 프로젝트 이름을 이용해서 log를 검색합니다.
+func FindToolProject(dbip, toolname, project string, page, pageMaxItemNum int) ([]Log, int, error) {
+	session, err := mgo.Dial(dbip)
+	if err != nil {
+		log.Println("DB Connect Err : ", err)
+		return nil, 0, err
+	}
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
+	var results []Log
+	c := session.DB(DBNAME).C(COLLECTION)
+	query := bson.M{"$and": []bson.M{
+		bson.M{"tool": &bson.RegEx{Pattern: toolname, Options: "i"}},
+		bson.M{"project": &bson.RegEx{Pattern: project, Options: "i"}},
+	}}
+	err = c.Find(query).Sort("-time").Skip(page - 1).Limit(pageMaxItemNum).All(&results)
+	if err != nil {
+		log.Println("DB Find Err : ", err)
+		return nil, 0, err
+	}
+	itemNum, err := c.Find(query).Count()
+	if err != nil {
+		log.Println("DB Find Err : ", err)
+		return nil, 0, err
+	}
+	return results, totalPage(itemNum, pageMaxItemNum), nil
+}
+
+// FindtpsDB 함수는 툴이름, 프로젝트, Slug를 입력받아서 로그를 검색한다.
+func FindToolProjectSlug(dbip, toolname, project, slug string, page, pageMaxItemNum int) ([]Log, int, error) {
+	session, err := mgo.Dial(dbip)
+	if err != nil {
+		log.Println("DB Connect Err : ", err)
+		return nil, 0, err
+	}
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
+	var results []Log
+	c := session.DB(DBNAME).C(COLLECTION)
+	query := bson.M{"$and": []bson.M{
+		bson.M{"tool": &bson.RegEx{Pattern: toolname, Options: "i"}},
+		bson.M{"project": &bson.RegEx{Pattern: project, Options: "i"}},
+		bson.M{"slug": &bson.RegEx{Pattern: slug, Options: "i"}},
+	}}
+	err = c.Find(query).Sort("-time").Skip((page - 1) * pageMaxItemNum).Limit(pageMaxItemNum).All(&results)
+	if err != nil {
+		log.Println("DB Find Err : ", err)
+		return nil, 0, err
+	}
+	itemNum, err := c.Find(query).Count()
+	if err != nil {
+		log.Println("DB Find Err : ", err)
+		return nil, 0, err
+	}
+	return results, totalPage(itemNum, pageMaxItemNum), nil
+}
+
+// Search 함수는 검색어를 이용해서 log를 검색합니다.
+func Search(dbip, words string, page, pageMaxItemNum int) ([]Log, int, error) {
+	session, err := mgo.Dial(dbip)
+	if err != nil {
+		log.Println("DB Connect Err : ", err)
+		return nil, 0, err
+	}
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
+	var results []Log
+	c := session.DB(DBNAME).C(COLLECTION)
+	wordQueries := []bson.M{}
+	for _, word := range strings.Split(words, " ") {
+		wordQueries = append(wordQueries, bson.M{"$or": []bson.M{
+			bson.M{"cip": &bson.RegEx{Pattern: word, Options: "i"}},
+			bson.M{"id": &bson.RegEx{Pattern: word, Options: "i"}},
+			bson.M{"log": &bson.RegEx{Pattern: word, Options: "i"}},
+			bson.M{"os": &bson.RegEx{Pattern: word, Options: "i"}},
+			bson.M{"project": &bson.RegEx{Pattern: word, Options: "i"}},
+			bson.M{"slug": &bson.RegEx{Pattern: word, Options: "i"}},
+			bson.M{"time": &bson.RegEx{Pattern: word, Options: "i"}},
+			bson.M{"time": word},
+			bson.M{"tool": &bson.RegEx{Pattern: word, Options: "i"}},
+			bson.M{"user": &bson.RegEx{Pattern: word, Options: "i"}},
+		}})
+	}
+	err = c.Find(bson.M{"$and": wordQueries}).Sort("-time").Skip((page - 1) * pageMaxItemNum).Limit(pageMaxItemNum).All(&results)
+	if err != nil {
+		log.Println("DB Find Err : ", err)
+		return nil, 0, err
+	}
+	itemNum, err := c.Find(bson.M{"$and": wordQueries}).Count()
+	if err != nil {
+		log.Println("DB Find Err : ", err)
+		return nil, 0, err
+	}
+	return results, totalPage(itemNum, pageMaxItemNum), nil
+}
+
+// Remove 함수는 log id를 이용해서 로그를 삭제합니다.
+func Remove(dbip, id string) error {
+	session, err := mgo.Dial(dbip)
+	if err != nil {
+		return err
+	}
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
+	err = session.DB(DBNAME).C(COLLECTION).Remove(bson.M{"id": id})
+	if err != nil {
+		return err
+	}
+	return nil
+
+}
+
+// Timecheck 함수는 RFC3339 시간문자열과 보관일을 받아서 보관일이 지난지 체크한다.
+func Timecheck(timestr string, keepdate int) bool {
+	t, err := time.Parse(time.RFC3339, timestr)
+	if err != nil {
+		log.Println(err)
+	}
+	addtime := t.AddDate(0, 0, keepdate)
+	now := time.Now()
+	return addtime.After(now) //추후 이 결과를 이용해서 참이면 리무브 대상이다.
 }

@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/digital-idea/dilog"
 	"github.com/shurcooL/httpfs/html/vfstemplate"
 )
 
@@ -24,7 +25,7 @@ type recipe struct {
 	Tool         string
 	Project      string
 	Slug         string
-	Logs         []Log
+	Logs         []dilog.Log
 	Page         int
 	TotalPagenum []string
 	Error        string
@@ -89,7 +90,7 @@ func search(w http.ResponseWriter, r *http.Request) {
 	rcp.Searchword = r.FormValue("searchword")
 
 	if rcp.Tool != "" && rcp.Project != "" && rcp.Slug != "" {
-		logs, totalPagenum, err := findtpsDB(rcp.Tool, rcp.Project, rcp.Slug, rcp.Page)
+		logs, totalPagenum, err := dilog.FindToolProjectSlug(*flagDBIP, rcp.Tool, rcp.Project, rcp.Slug, rcp.Page, *flagPagenum)
 		if err != nil {
 			log.Println(err)
 			rcp.Error = err.Error()
@@ -112,7 +113,7 @@ func search(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if rcp.Tool != "" && rcp.Project != "" {
-		logs, totalPagenum, err := findtpDB(rcp.Tool, rcp.Project, rcp.Page)
+		logs, totalPagenum, err := dilog.FindToolProject(*flagDBIP, rcp.Tool, rcp.Project, rcp.Page, *flagPagenum)
 		if err != nil {
 			log.Println(err)
 			rcp.Error = err.Error()
@@ -135,7 +136,7 @@ func search(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if rcp.Tool != "" {
-		logs, totalPagenum, err := findtDB(rcp.Tool, rcp.Page)
+		logs, totalPagenum, err := dilog.FindTool(*flagDBIP, rcp.Tool, rcp.Page, *flagPagenum)
 		if err != nil {
 			log.Println(err)
 			rcp.Error = err.Error()
@@ -158,7 +159,7 @@ func search(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if rcp.Searchword != "" {
-		logs, totalPagenum, err := findDB(rcp.Searchword, rcp.Page)
+		logs, totalPagenum, err := dilog.Search(*flagDBIP, rcp.Searchword, rcp.Page, *flagPagenum)
 		if err != nil {
 			log.Println(err)
 			rcp.Error = err.Error()
@@ -269,7 +270,7 @@ func handleAPISetLog(w http.ResponseWriter, r *http.Request) {
 			user = v
 		}
 	}
-	err = addDB(ip, log, project, slug, tool, user, keep)
+	err = dilog.Add(*flagDBIP, ip, log, project, slug, tool, user, keep)
 	if err != nil {
 		fmt.Fprintln(w, err)
 	}
@@ -290,13 +291,4 @@ func Webserver() {
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-// TotalPage 함수는 아이템의 갯수를 이용해서 총 페이지수를 반환한다.
-func TotalPage(itemNum int) int {
-	page := itemNum / *flagPagenum
-	if itemNum%*flagPagenum != 0 {
-		page++
-	}
-	return page
 }

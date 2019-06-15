@@ -1,5 +1,4 @@
-bin
 *.swp
 .DS_Store
-/bin
+/cmd/bin
 coverage.txt
