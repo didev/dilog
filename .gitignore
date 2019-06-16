@@ -2,3 +2,4 @@
 .DS_Store
 /cmd/bin
 coverage.txt
+/bin
