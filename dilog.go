@@ -30,7 +30,7 @@ type Log struct {
 }
 
 // Add 함수는 log 를 추가합니다.
-func Add(dbip, ip, logstr, project, slug, tool, user string, keep int) error {
+func Add(dbip, ip, logstr, project, slug, tool, user, addtime string, keep int) error {
 	session, err := mgo.Dial(dbip)
 	if err != nil {
 		return err
@@ -46,7 +46,7 @@ func Add(dbip, ip, logstr, project, slug, tool, user string, keep int) error {
 		Log:     logstr,
 		Project: project,
 		Slug:    slug,
-		Time:    now.Format(time.RFC3339),
+		Time:    addtime,
 		Tool:    tool,
 		User:    user,
 	}
@@ -216,5 +216,5 @@ func Timecheck(timestr string, keepdate int) (bool, error) {
 	}
 	addtime := t.AddDate(0, 0, keepdate)
 	now := time.Now()
-	return addtime.After(now), nil //추후 이 결과를 이용해서 참이면 리무브 대상이다.
+	return now.After(addtime), nil //추후 이 결과를 이용해서 참이면 리무브 대상이다.
 }

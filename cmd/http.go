@@ -8,6 +8,7 @@ import (
 	"net"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/digital-idea/dilog"
 	"github.com/shurcooL/httpfs/html/vfstemplate"
@@ -270,7 +271,8 @@ func handleAPISetLog(w http.ResponseWriter, r *http.Request) {
 			user = v
 		}
 	}
-	err = dilog.Add(*flagDBIP, ip, log, project, slug, tool, user, keep)
+	now := time.Now()
+	err = dilog.Add(*flagDBIP, ip, log, project, slug, tool, user, now.Format(time.RFC3339), keep)
 	if err != nil {
 		fmt.Fprintln(w, err)
 	}
