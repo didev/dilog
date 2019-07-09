@@ -12,12 +12,12 @@
 오직 실행파일 하나면 됩니다.
 하나의 실행파일로 클라이언트 명령어, 웹서버 및 restAPI 기능을 사용할 수 있습니다.
 
-- [Linux 64bit](https://github.com/digital-idea/dilog/releases/download/v1.0.4/dilog_linux_x86-64.tgz)
-- [Linux 64bit Digitalidea](https://github.com/digital-idea/dilog/releases/download/v1.0.4/dilog_linux_di_x86-64.tgz)
-- [macOS 64bit](https://github.com/digital-idea/dilog/releases/download/v1.0.4/dilog_darwin_x86-64.tgz)
-- [macOS 64bit Digitalidea](https://github.com/digital-idea/dilog/releases/download/v1.0.4/dilog_darwin_di_x86-64.tgz)
-- [Windows 64bit](https://github.com/digital-idea/dilog/releases/download/v1.0.4/dilog_windows_x86-64.tgz)
-- [Windows 64bit Digitalidea](https://github.com/digital-idea/dilog/releases/download/v1.0.4/dilog_windows_di_x86-64.tgz)
+- [Linux 64bit](https://github.com/digital-idea/dilog/releases/download/v1.0.5/dilog_linux_x86-64.tgz)
+- [Linux 64bit Digitalidea](https://github.com/digital-idea/dilog/releases/download/v1.0.5/dilog_linux_di_x86-64.tgz)
+- [macOS 64bit](https://github.com/digital-idea/dilog/releases/download/v1.0.5/dilog_darwin_x86-64.tgz)
+- [macOS 64bit Digitalidea](https://github.com/digital-idea/dilog/releases/download/v1.0.5/dilog_darwin_di_x86-64.tgz)
+- [Windows 64bit](https://github.com/digital-idea/dilog/releases/download/v1.0.5/dilog_windows_x86-64.tgz)
+- [Windows 64bit Digitalidea](https://github.com/digital-idea/dilog/releases/download/v1.0.5/dilog_windows_di_x86-64.tgz)
 
 ### mongoDB 설치, 실행
 이곳에서 mongoDB에 대해서 자세히 다루지 않습니다.
