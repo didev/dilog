@@ -10,9 +10,9 @@ GOOS=linux GOARCH=amd64 go build -o ./bin/linux/${APP} main.go network.go http.g
 GOOS=windows GOARCH=amd64 go build -o ./bin/windows/${APP}.exe main.go network.go http.go templatefunc.go assets_vfsdata.go
 GOOS=darwin GOARCH=amd64 go build -o ./bin/darwin/${APP} main.go network.go http.go templatefunc.go assets_vfsdata.go
 
-GOOS=linux GOARCH=amd64 go build -ldflags "-X main.DBIP=10.0.90.251" -o ./bin/linux_di/${APP} main.go network.go http.go templatefunc.go assets_vfsdata.go
-GOOS=windows GOARCH=amd64 go build -ldflags "-X main.DBIP=10.0.90.251" -o ./bin/windows_di/${APP}.exe main.go network.go http.go templatefunc.go assets_vfsdata.go
-GOOS=darwin GOARCH=amd64 go build -ldflags "-X main.DBIP=10.0.90.251" -o ./bin/darwin_di/${APP} main.go network.go http.go templatefunc.go assets_vfsdata.go
+GOOS=linux GOARCH=amd64 go build -ldflags "-X main.DBIP=10.0.90.253" -o ./bin/linux_di/${APP} main.go network.go http.go templatefunc.go assets_vfsdata.go
+GOOS=windows GOARCH=amd64 go build -ldflags "-X main.DBIP=10.0.90.253" -o ./bin/windows_di/${APP}.exe main.go network.go http.go templatefunc.go assets_vfsdata.go
+GOOS=darwin GOARCH=amd64 go build -ldflags "-X main.DBIP=10.0.90.253" -o ./bin/darwin_di/${APP} main.go network.go http.go templatefunc.go assets_vfsdata.go
 
 # Github Release에 업로드 하기위해 압축
 cd ./bin/linux/ && tar -zcvf ../${APP}_linux_x86-64.tgz . && cd -
