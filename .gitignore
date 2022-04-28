@@ -3,3 +3,4 @@
 /cmd/bin
 coverage.txt
 /bin
+assets_vfsdata.go
